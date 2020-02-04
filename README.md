@@ -35,6 +35,8 @@ Global Architectural Structure of the Project:
 ![alt text](https://upload-images.jianshu.io/upload_images/1452123-09556716dc29be12.gif?imageMogr2/auto-orient/strip|imageView2/2/format/gif)    
 
 This gif illustrates the "gossip" protocol we are trying to implement. The idea is to have a node receive some sort of update, and having it communicate in order to update its neighboring nodes. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved. 
+
+![projectDiagram](images/Project_Diagram.pdf)
  
 This diagram illustrates our global architectural design for the project. The Cluster is depicted as being updated with new information from the user. Each worker node is then shown communicating and updating its neighboring nodes. This information then propagates throughout the entire cluster, thus completing reconciliation using a “gossip protocol”.  (can assume update successful after syncing with its immediate peers. This needs to be the case because you don’t know when the information can propagate throughout the entire cluster. It is reliable enough by fixing a minimum amount of neighbors communicated (say 3) and trust that 3 of its neighbors will delegate the information. If you fear nodes failures, that is discoverable by heartbeat timeout, which should be out of project scope. It can be part of the project, but let’s not, unless you want to.)    
 Design Implications and Discussion:      
