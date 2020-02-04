@@ -59,7 +59,7 @@ Minimum acceptance criteria is that compared with current Raft algorithm, creati
 - **Release 1** (1~2 weeks)
   - A simple implementation of reconciling information between two instances of etcd. 
   - CPIsync library, more specifically the interactive CPIsync, should be used to achieve this.
-- **Release 2 ** (4~6 weeks)
+- **Release 2** (4~6 weeks)
   - Codes related to updating the key value store and logs (code piece such as electing leader, heatbeating) in etcd should be swapped out.
   - Implement gossip protocol to synchronize data between nodes.
   - Test cases are also expected to come together
