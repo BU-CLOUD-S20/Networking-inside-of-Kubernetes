@@ -15,11 +15,11 @@ This project does NOT target:
 + Applications that cannot tolerate eventual consistency, stale data, or rollbacks    
 + [Storage for more than a few gigabytes][3] (>8 GB) of data (use NewSQL instead)
 + [Horizontally scaling databases][4] (>1 cluster)
- 
-[1]: https://github.com/kubernetes/kubernetes/issues/20540    
-[2]: https://openai.com/blog/scaling-kubernetes-to-2500-nodes/    
-[3]: https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/limit.md    
-[4]: https://github.com/etcd-io/etcd/blob/master/Documentation/learning/why.md   
+
+[1]: https://github.com/kubernetes/kubernetes/issues/20540
+[2]: https://openai.com/blog/scaling-kubernetes-to-2500-nodes/
+[3]: https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/limit.md
+[4]: https://github.com/etcd-io/etcd/blob/master/Documentation/learning/why.md
 
 ## 3. Scope and Features Of The Project
 The scope of the project aims at large scale metadata stored in Etcd which need to be updated in time. Instead of Raft consensus algorithm, gossip protocol discards the “leader approach” and saves the cost of time to leader election and. Having one leader create a one point of failure not to mention that the leader has to communicate with all nodes for an update. Failure detection guarantee the reliability of the network from periodically pinging each node by its neighbors, which mitigates the  average error rate during the process of handshake.
@@ -37,7 +37,7 @@ Global Architectural Structure of the Project:
 This gif illustrates the "gossip" protocol we are trying to implement. The idea is to have a node receive some sort of update, and having it communicate in order to update its neighboring nodes. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved. 
 
 ![projectDiagram](images/Project_Diagram.png)
- 
+
 This diagram illustrates our global architectural design for the project. The Cluster is depicted as being updated with new information from the user. Each worker node is then shown communicating and updating its neighboring nodes. This information then propagates throughout the entire cluster, thus completing reconciliation using a “gossip protocol”. 
 
 Design Implications and Discussion:      
@@ -51,26 +51,22 @@ Minimum acceptance criteria is that compared with current Raft algorithm, creati
 + Detecting failures during networking     
 
 ## 6. Release Planning
-First Step
-1~2 weeks
-Team members should have the basics of Golang and Gossip Protocol
-Everyone should also get familiar with etcd's source code and architecture.
-Meantime, discuss about how consensus protocol(Raft) works in etcd and what information should be synchronized between instances to perform updates.
-Release 1
-1~2 weeks
-A simple implementation of reconciling information  between two instances of etcd
-CPIsync library, more specifically the interactive CPIsync, should be used to achieve this
-Release 2
-4~6 weeks
-Codes related to updating the key value store and logs (code piece such as electing leader, heatbeating) in etcd should be swapped out 
-Implement gossip protocol to synchronize data between nodes 
-Test cases are also expected to come together
-Release 3
-1 week
-Debug done, the new system should work
-Final Step (Hopefully)
-Class ends
-Use the stable released version to replace the metadata storage in Kubernetes
+
+- **First Step** (1~2 weeks)
+  - Team members should have the basics of Golang and Gossip Protocol. 
+  - Everyone should also get familiar with etcd's source code and architecture.
+  - Meantime, discuss about how consensus protocol(Raft) works in etcd and what information should be synchronized between instances to perform updates.
+- **Release 1** (1~2 weeks)
+  - A simple implementation of reconciling information between two instances of etcd. 
+  - CPIsync library, more specifically the interactive CPIsync, should be used to achieve this.
+- **Release 2 ** (4~6 weeks)
+  - Codes related to updating the key value store and logs (code piece such as electing leader, heatbeating) in etcd should be swapped out.
+  - Implement gossip protocol to synchronize data between nodes.
+  - Test cases are also expected to come together
+- **Release 3** (1 week)
+  - Debug done, the new system should work
+- **Final Step** (Hopefully) (Class ends)
+  - Use the stable released version to replace the metadata storage in Kubernetes
 
 
 ## General comments
