@@ -70,9 +70,10 @@ Minimum acceptance criteria is that compared with current Raft algorithm, creati
   - Use the stable released version to replace the metadata storage in Kubernetes
 
 ## 7. Risks   
-Risks for our project are below:   
+Potential risks for our project:   
 + Our enhanced Etcd could not be integrated in Kubernetes successfully   
-+ Our enhanced Etcd is not stable / scalable in the environment   
++ Our enhanced Etcd is not stable or scalable in the environment   
++ Our algorithm may not be able to have enough consistency to offer a legitimate alternative to the Raft algorithm
 
 ## General comments
 Before implementing “gossip protocol” into Etcd, the first step is to get practical set reconciliation between two instances, then test its performances in small groups in comparison to Raft. The result might be little in differences when group size is small, then we record the performance as an enlarging set.
