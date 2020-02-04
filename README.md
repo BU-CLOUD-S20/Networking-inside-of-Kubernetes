@@ -1,11 +1,12 @@
 # Networking-inside-of-Kubernetes
 ## 1. Vision and Goals Of The Project: [Zhou]
-Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client. 
-Disadvantage of current Raft algorithm is obvious that not able to scale which causes the speed to reply to the client is slow.
-Therefore, high level  goal of our projects is  replacing current Raft algorithm with a bandwidth-efficient and faster “gossip protocol” which will include:
-Providing a faster and stable algorithm that reply to the client in a shorter time. We can assume consistency right after a node updated its neighbor.
-Use “gossip protocol” that sync to neighbouring nodes directly (set up “practical set reconciliation”) instead of updating to leader node first
-Enabling a strongly consistent service that no need to cost performance for large scale clusters
+Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client.      
+Disadvantage of current Raft algorithm is obvious that not able to scale which causes the speed to reply to the client is slow.     
+Therefore, high level  goal of our projects is  replacing current Raft algorithm with a bandwidth-efficient and faster “gossip protocol” which will include:    
++ Providing a faster and stable algorithm that reply to the client in a shorter time. We can assume consistency right after a node updated its neighbor.     
++ Use “gossip protocol” that sync to neighbouring nodes directly (set up “practical set reconciliation”) instead of updating to leader node first     
++ Enabling a strongly consistent service that no need to cost performance for large scale clusters     
+
 ## 2. Users/Personas Of The Project[Zhe]:
 The modified version of Etcd targets Kubernetes developers and large clusters (much more than the current usable limit of 1000 nodes in magnitude) that depend on Etcd for handling metadata and coordination [1]. The gossip protocol accommodates hardware and design limitations (e.g. hard disk speed, restricted cache availability) by reducing instruction redundancy [2]. 
 
