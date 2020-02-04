@@ -1,5 +1,5 @@
 # Networking-inside-of-Kubernetes
-## 1. Vision and Goals Of The Project: [Zhou]
+## 1. Vision and Goals Of The Project
 Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client.      
 Disadvantage of current Raft algorithm is obvious that not able to scale which causes the speed to reply to the client is slow.     
 Therefore, high level  goal of our projects is  replacing current Raft algorithm with a bandwidth-efficient and faster “gossip protocol” which will include:    
@@ -7,7 +7,7 @@ Therefore, high level  goal of our projects is  replacing current Raft algorithm
 + Use “gossip protocol” that sync to neighbouring nodes directly (set up “practical set reconciliation”) instead of updating to leader node first     
 + Enabling a strongly consistent service that no need to cost performance for large scale clusters     
 
-## 2. Users/Personas Of The Project[Zhe]:
+## 2. Users/Personas Of The Project
 The modified version of Etcd targets Kubernetes developers and large clusters (much more than the current usable limit of 1000 nodes in magnitude) that depend on Etcd for handling metadata and coordination [1]. The gossip protocol accommodates hardware and design limitations (e.g. hard disk speed, restricted cache availability) by reducing instruction redundancy [2].     
 
 This project does NOT target:    
@@ -21,7 +21,7 @@ This project does NOT target:
 [3]: https://github.com/etcd-io/etcd/blob/master/Documentation/learning/why.md    
 [4]: https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/limit.md    
 
-## 3. Scope and Features Of The Project:[Geng]
+## 3. Scope and Features Of The Project
 The scope of the project aims at large scale metadata stored in Etcd which need to be updated in time. Instead of Raft consensus algorithm, gossip protocol discards the “leader approach” and saves the cost of time to leader election and. Having one leader create a one point of failure not to mention that the leader has to communicate with all nodes for an update. Failure detection guarantee the reliability of the network from periodically pinging each node by its neighbors, which mitigates the  average error rate during the process of handshake.
 
 Therefore, the main features are:
@@ -29,7 +29,7 @@ Therefore, the main features are:
 - Responding to client requests quicker 
 - Failure detection ensures the robustness and reliability of the network
 
-## 4. Solution Concept:[Alex]
+## 4. Solution Concept:
 A high-level outline of the solution:     
 Global Architectural Structure of the Project:     
 ![alt text](https://upload-images.jianshu.io/upload_images/1452123-09556716dc29be12.gif?imageMogr2/auto-orient/strip|imageView2/2/format/gif)    
@@ -37,14 +37,14 @@ This diagram illustrates our global architectural design for the project. The Cl
 Design Implications and Discussion:      
 This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes.  with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.       
 
-## 5. Acceptance criteria [Zhou]
+## 5. Acceptance criteria
 Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:    
 + Deploying our enhanced Etcd into a Kubernetes cluster and gather performance data comparing with a vanilla kubernetes cluster of different sizes    
 + Running our enhanced Etcd stablly in developer and user environment     
 + Shortening the time to respond to client request    
 + Detecting failures during networking     
 
-## 6. Release Planning:[Fuyao]
+## 6. Release Planning
 First Step
 1~2 weeks
 Team members should have the basics of Golang and Gossip Protocol
@@ -67,5 +67,5 @@ Class ends
 Use the stable released version to replace the metadata storage in Kubernetes
 
 
-## General comments[Geng]
+## General comments
 Before implementing “gossip protocol” into Etcd, the first step is to get practical set reconciliation between two instances, then test its performances in small groups in comparison to Raft. The result might be little in differences when group size is small, then we record the performance as an enlarging set.
