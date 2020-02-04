@@ -63,11 +63,11 @@ Minimum acceptance criteria is that compared with current Raft algorithm, creati
 - **Release 2** (4~6 weeks)
   - Codes related to updating the key value store and logs (code piece such as electing leader, heatbeating) in etcd should be swapped out.
   - Implement gossip protocol to synchronize data between nodes.
-  - Test cases are also expected to come together
+  - Test cases are also expected to come together.
 - **Release 3** (1 week)
-  - Debug done, the new system should work
+  - Debug done, the new system should work.
 - **Final Step** (Hopefully) (Class ends)
-  - Use the stable released version to replace the metadata storage in Kubernetes
+  - Use the stable released version to replace the metadata storage in Kubernetes.
 
 ## 7. Risks   
 Potential risks for our project:   
