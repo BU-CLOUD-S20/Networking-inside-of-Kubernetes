@@ -13,13 +13,13 @@ The modified version of Etcd targets Kubernetes developers and large clusters (m
 This project does NOT target:    
 + End-users of Kubernetes    
 + Applications that cannot tolerate eventual consistency, stale data, or rollbacks    
-+ Storage for more than a few gigabytes (>8 GB) of data (use NewSQL instead) [3]  [4]    
-+ Horizontally scaling databases (>1 cluster) [3]   
++ Storage for more than a few gigabytes (>8 GB) of data (use NewSQL instead) [3]    
++ [Horizontally scaling databases][4] (>1 cluster)
  
 [1]: https://github.com/kubernetes/kubernetes/issues/20540    
 [2]: https://openai.com/blog/scaling-kubernetes-to-2500-nodes/    
-[3]: https://github.com/etcd-io/etcd/blob/master/Documentation/learning/why.md    
-[4]: https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/limit.md    
+[3]: https://github.com/etcd-io/etcd/blob/master/Documentation/dev-guide/limit.md    
+[4]: https://github.com/etcd-io/etcd/blob/master/Documentation/learning/why.md   
 
 ## 3. Scope and Features Of The Project
 The scope of the project aims at large scale metadata stored in Etcd which need to be updated in time. Instead of Raft consensus algorithm, gossip protocol discards the “leader approach” and saves the cost of time to leader election and. Having one leader create a one point of failure not to mention that the leader has to communicate with all nodes for an update. Failure detection guarantee the reliability of the network from periodically pinging each node by its neighbors, which mitigates the  average error rate during the process of handshake.
