@@ -5,7 +5,7 @@ Disadvantage of current Raft algorithm is obvious that not able to scale which c
 Therefore, high level  goal of our projects is  replacing current Raft algorithm with a bandwidth-efficient and faster “gossip protocol” which will include:    
 + Providing a faster and stable algorithm that reply to the client in a shorter time. We can assume consistency right after a node updated its neighbor.     
 + Use “gossip protocol” that sync to neighbouring nodes directly (set up “practical set reconciliation”) instead of updating to leader node first     
-+ Enabling a strongly consistent service that no need to cost performance for large scale clusters     
++ Enabling an eventually consistent service with minimal cost performance for large scale clusters     
 
 ## 2. Users/Personas Of The Project
 The modified version of Etcd targets Kubernetes developers and large clusters (much more than the [current usable limit of 1000][1] nodes in magnitude) that depend on Etcd for handling metadata and coordination. The gossip protocol accommodates hardware and design limitations (e.g. [hard disk speed][2], restricted cache availability) by reducing instruction redundancy.     
