@@ -30,12 +30,12 @@ Therefore, the main features are:
 - Failure detection ensures the robustness and reliability of the network
 
 ## 4. Solution Concept:[Alex]
-A high-level outline of the solution:
-Global Architectural Structure of the Project:
-![alt text](https://upload-images.jianshu.io/upload_images/1452123-09556716dc29be12.gif?imageMogr2/auto-orient/strip|imageView2/2/format/gif)
-This diagram illustrates our global architectural design for the project. The Cluster is depicted as being updated with new information from the user. Each worker node is then shown communicating and updating its neighboring nodes. This information then propagates throughout the entire cluster, thus completing reconciliation using a “gossip protocol”.  (can assume update successful after syncing with its immediate peers. This needs to be the case because you don’t know when the information can propagate throughout the entire cluster. It is reliable enough by fixing a minimum amount of neighbors communicated (say 3) and trust that 3 of its neighbors will delegate the information. If you fear nodes failures, that is discoverable by heartbeat timeout, which should be out of project scope. It can be part of the project, but let’s not, unless you want to.)
-Design Implications and Discussion:
-This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes.  with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.    
+A high-level outline of the solution:     
+Global Architectural Structure of the Project:     
+![alt text](https://upload-images.jianshu.io/upload_images/1452123-09556716dc29be12.gif?imageMogr2/auto-orient/strip|imageView2/2/format/gif)    
+This diagram illustrates our global architectural design for the project. The Cluster is depicted as being updated with new information from the user. Each worker node is then shown communicating and updating its neighboring nodes. This information then propagates throughout the entire cluster, thus completing reconciliation using a “gossip protocol”.  (can assume update successful after syncing with its immediate peers. This needs to be the case because you don’t know when the information can propagate throughout the entire cluster. It is reliable enough by fixing a minimum amount of neighbors communicated (say 3) and trust that 3 of its neighbors will delegate the information. If you fear nodes failures, that is discoverable by heartbeat timeout, which should be out of project scope. It can be part of the project, but let’s not, unless you want to.)    
+Design Implications and Discussion:      
+This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes.  with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.       
 
 ## 5. Acceptance criteria [Zhou]
 Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:    
