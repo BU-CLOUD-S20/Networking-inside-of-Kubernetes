@@ -13,7 +13,7 @@ The modified version of Etcd targets Kubernetes developers and large clusters (m
 This project does NOT target:    
 + End-users of Kubernetes    
 + Applications that cannot tolerate eventual consistency, stale data, or rollbacks    
-+ Storage for more than a few gigabytes (>8 GB) of data (use NewSQL instead) [3][4]    
++ Storage for more than a few gigabytes (>8 GB) of data (use NewSQL instead) [3]  [4]    
 + Horizontally scaling databases (>1 cluster) [3]   
  
 [1]: https://github.com/kubernetes/kubernetes/issues/20540    
