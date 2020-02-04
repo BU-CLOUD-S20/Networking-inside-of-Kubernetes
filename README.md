@@ -39,7 +39,7 @@ This diagram illustrates our global architectural design for the project. The Cl
 
 ![alt text](https://upload-images.jianshu.io/upload_images/1452123-09556716dc29be12.gif?imageMogr2/auto-orient/strip|imageView2/2/format/gif)    
 
-This gif illustrates the "gossip protocol" we are trying to implement. The idea is to have a node receive some sort of update, and having it communicate in order to update its neighboring nodes. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved.
+This gif illustrates the "gossip protocol" we are trying to implement. The idea is to have a node receive some sort of update, and having it communicate with its neighboring nodes. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved.
 
 Design Implications and Discussion:      
 This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.       
