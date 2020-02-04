@@ -34,17 +34,15 @@ A high-level outline of the solution:
 Global Architectural Structure of the Project:
 This diagram illustrates our global architectural design for the project. The Cluster is depicted as being updated with new information from the user. Each worker node is then shown communicating and updating its neighboring nodes. This information then propagates throughout the entire cluster, thus completing reconciliation using a “gossip protocol”.  (can assume update successful after syncing with its immediate peers. This needs to be the case because you don’t know when the information can propagate throughout the entire cluster. It is reliable enough by fixing a minimum amount of neighbors communicated (say 3) and trust that 3 of its neighbors will delegate the information. If you fear nodes failures, that is discoverable by heartbeat timeout, which should be out of project scope. It can be part of the project, but let’s not, unless you want to.)
 Design Implications and Discussion:
-This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes.  with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.
+This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes.  with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.    
+
 ## 5. Acceptance criteria [Zhou]
-Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:
-Deploying our enhanced Etcd into a Kubernetes cluster and gather performance data comparing with a vanilla kubernetes cluster of different sizes
-Running our enhanced Etcd stablly in developer and user environment 
-Shortening the time to respond to client request
-Detecting failures during networking (? maybe)
- 
-Compare to current Raft algorithm, our new algorithm could update information to neighbouring nodes to set up a “practical set reconciliation” in order to shorten the time to reply to the client
-This should be the most important part. It is defining the Minimum viable product.
-THIS SECTION NEEDS REWORK. Please be very concrete about your goals. Especially the acceptance criteria. A reviewer should know exactly where to look after reading this and decide if the project outcome satisfies what is mentioned.
+Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:    
++ Deploying our enhanced Etcd into a Kubernetes cluster and gather performance data comparing with a vanilla kubernetes cluster of different sizes    
++ Running our enhanced Etcd stablly in developer and user environment     
++ Shortening the time to respond to client request    
++ Detecting failures during networking     
+
 ## 6. Release Planning:[Fuyao]
 First Step
 1~2 weeks
