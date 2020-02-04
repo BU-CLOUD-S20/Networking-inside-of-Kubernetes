@@ -67,7 +67,7 @@ Minimum acceptance criteria is that compared with current Raft algorithm, creati
 - **Release 3** (1 week)
   - Debug done, the new system should work.
 - **Final Step** (Hopefully) (Class ends)
-  - Use the stable released version to replace the metadata storage in Kubernetes.
+  - Use the stable released version to replace the metadata storage in Kubernetes
 
 ## 7. Risks   
 Potential risks for our project:   
