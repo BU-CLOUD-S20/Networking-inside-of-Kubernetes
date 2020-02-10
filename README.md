@@ -5,9 +5,9 @@
 @ Bowen Song    
 @ Alexander Trinh	    
 @ Fuyao Wang	  
-@ Zhe Deng
+@ Zhe Deng    
 @ Geng Song   
-@ Zhou Shen	   
+@ [Zhou Shen](https://github.com/zhou-1)  	   
 
 ## 1. Vision and Goals Of The Project
 Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client.      
