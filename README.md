@@ -1,4 +1,14 @@
-# Networking-inside-of-Kubernetes
+# Networking-inside-of-Kubernetes   
+
+## Contributors:   
+@ Anish Gupta    
+@ Bowen Song    
+@ Alexander Trinh	    
+@ Fuyao Wang	  
+@ Zhe Deng
+@ Geng Song   
+@ Zhou Shen	   
+
 ## 1. Vision and Goals Of The Project
 Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client.      
 Disadvantage of current Raft algorithm is obvious that not able to scale which causes the speed to reply to the client is slow.     
