@@ -18,13 +18,14 @@ Therefore, high level  goal of our projects is  replacing current Raft algorithm
 + Enabling an eventually consistent service with minimal cost performance for large scale clusters     
 
 ## 2. Users/Personas Of The Project
-The modified version of Etcd targets Kubernetes developers and large clusters (much more than the [current usable limit of 1000][1] nodes in magnitude) that depend on Etcd for handling metadata and coordination. The gossip protocol accommodates hardware and design limitations (e.g. [hard disk speed][2], restricted cache availability) by reducing instruction redundancy.     
+The modified version of Etcd targets Kubernetes developers and large clusters (much more than the [current usable limit of 1000][1] nodes in magnitude) that depend on Etcd for handling metadata and coordination. The gossip protocol accommodates hardware and design limitations (e.g. [hard disk speed][2], restricted cache availability) by reducing redundant writes.     
 
-This project does NOT target:    
-+ End-users of Kubernetes    
-+ Applications that cannot tolerate eventual consistency, stale data, or rollbacks    
-+ [Storage for more than a few gigabytes][3] (>8 GB) of data (use NewSQL instead)
-+ [Horizontally scaling databases][4] (>1 cluster)
+This project will NOT:    
++ Target end-users of Kubernetes  
++ Replace RAFT in Etcd
++ Handle data that cannot tolerate eventual consistency    
++ Store [more than a few gigabytes] of data[3] (>8 GB) of data (use NewSQL instead)
++ Target [Horizontally scaling databases][4] (>1 cluster)
 
 [1]: https://github.com/kubernetes/kubernetes/issues/20540
 [2]: https://openai.com/blog/scaling-kubernetes-to-2500-nodes/
