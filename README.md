@@ -65,12 +65,12 @@ Minimum acceptance criteria is that compared with current Raft algorithm, creati
 ## 6. Release Planning
 
 - **First Step** (1~2 weeks)
-  - Team members should have the basics of Golang and Gossip Protocol. 
+  - Team members should have the basics of C++ and Gossip Protocol. 
   - Everyone should also get familiar with etcd's source code and architecture.
   - Meantime, discuss about how consensus protocol(Raft) works in etcd and what information should be synchronized between instances to perform updates.
 - **Release 1** (1~2 weeks)
-  - A simple implementation of reconciling information between two instances of etcd. 
-  - CPIsync library, more specifically the interactive CPIsync, should be used to achieve this.
+  - A simple implementation of reconciling information between two instances of the new database. 
+  - LevelDB, the key-value storage, CPIsync library, more specifically the interactive CPIsync, should be used to achieve this.
 - **Release 2** (4~6 weeks)
   - Codes related to updating the key value store and logs (code piece such as electing leader, heatbeating) in etcd should be swapped out.
   - Implement gossip protocol to synchronize data between nodes.
