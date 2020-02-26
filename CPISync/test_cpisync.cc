@@ -8,31 +8,10 @@ using std::endl;
 using std::string;
 
 int main(int argc, char *argv[]) {
-    if(strcmp(argv[1], "client")!=0 && strcmp(argv[1], "server")!=0) {
-        cout << "usage: 'TryMe client <sync type>' for client mode, 'TryMe server <sync type>' for server mode." << endl;
-        cout << "run the client in one terminal instance and the server in another." << endl;
-        exit(0);
-    }
 
     GenSync::SyncProtocol prot;
-    string type = string(argv[2]);
     
-    if(type == "CPISync") {
-        prot = GenSync::SyncProtocol::CPISync;
-    } else if (type == "InterCPISync") {
-        prot = GenSync::SyncProtocol::InteractiveCPISync;
-    } else if (type == "OneWayCPISync") {
-        prot = GenSync::SyncProtocol::OneWayCPISync;
-    } else if (type == "FullSync") {
-        prot = GenSync::SyncProtocol::FullSync;
-    } else if (type == "IBLTSync") {
-        prot = GenSync::SyncProtocol::IBLTSync;
-    } else if (type == "OneWayIBLTSync") {
-        prot = GenSync::SyncProtocol::OneWayIBLTSync;
-    } else {
-        cout << "invalid sync type!" << endl;
-        exit(1);
-    }
+    prot = GenSync::SyncProtocol::InteractiveCPISync;
 
     const int PORT = 8001; // port on which to connect
     const int ERR = 8; // inverse log of error chance
@@ -57,18 +36,9 @@ int main(int argc, char *argv[]) {
     genSync.addElem(make_shared<DataObject>('b'));
     genSync.addElem(make_shared<DataObject>('c'));
 
-    if(strcmp(argv[1], "client")==0) {
-        genSync.addElem(make_shared<DataObject>('d'));
+    genSync.addElem(make_shared<DataObject>('d'));
 
-        cout << "listening on port " << PORT << "..." << endl;
-		genSync.clientSyncBegin(0);
-        cout << "sync succeeded." << endl;
-
-    } else {
-        genSync.addElem(make_shared<DataObject>('e'));
-
-        cout << "connecting on port " << PORT << "..." << endl;
-		genSync.serverSyncBegin(0);
-        cout << "sync succeeded." << endl;
-    }
+    cout << "listening on port " << PORT << "..." << endl;
+    genSync.clientSyncBegin(0);
+    cout << "sync succeeded." << endl;
 }

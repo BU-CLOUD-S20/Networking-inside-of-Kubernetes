@@ -1,0 +1,1 @@
+g++ test_cpisync.cc -o test -lcpisync -lntl -lpthread -lgmp -std=c++11
