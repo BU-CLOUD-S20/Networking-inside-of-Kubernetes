@@ -1,1 +1,1 @@
-g++ test_leveldb.cc -o test -lpthread -lleveldb -std=c++11
+g++ test_leveldb.cc -o test -pthread -lleveldb -std=c++11
