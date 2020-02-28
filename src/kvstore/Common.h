@@ -5,6 +5,7 @@
 
 namespace niok {
 namespace kvstorage {
+
 enum ResultCode {
     SUCCEEDED               = 0,
     ERR_SPACE_NOT_FOUND     = -1,
@@ -12,6 +13,11 @@ enum ResultCode {
     ERR_CONSENSUS_ERROR     = -4,
     ERR_UNKNOWN             = -100,
 };
+
+inline leveldb::Slice toSlice(const std::string& str) {
+    return leveldb::Slice(str.begin(), str.size());
+}
+
 } // namespace kvstorage
 } // namespace niok
 #endif

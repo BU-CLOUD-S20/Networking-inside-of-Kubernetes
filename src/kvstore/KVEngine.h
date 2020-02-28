@@ -11,7 +11,7 @@ class WriteBatch {
 public:
     virtual ~WriteBatch() = default;
 
-    virtual ResultCode put(folly::StringPiece key, folly::StringPiece value) = 0;
+    virtual ResultCode put(std::string key, std::string value) = 0;
 
 };
 
@@ -23,6 +23,7 @@ public:
 
     // Read a single key
     virtual ResultCode get(const std::string& key, std::string* value) = 0;
+
     // Get all results in range [start, end)
     virtual ResultCode put(std::string key, std::string value) = 0;
 

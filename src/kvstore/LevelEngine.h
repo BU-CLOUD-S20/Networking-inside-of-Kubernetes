@@ -9,13 +9,14 @@ namespace niok {
 namespace kvstore {
 
 class LevelEngine : public KVEngine {
-private:
-
 public:
     ResultCode get(const std::string& key, std::string* value) override;
-    
+
     ResultCode put(std::string key, std::string value) override;
 
+private:
+    //std::string  dataPath_;
+    std::unique_ptr<leveldb::DB> db_{nullptr};
 };
 } // namespace kvstore    
 } // namespace niok

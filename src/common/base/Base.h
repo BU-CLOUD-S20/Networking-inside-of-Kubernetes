@@ -40,6 +40,16 @@
 #include <cassert>
 #include <cmath>
 
+// Formated logging
+#define FLOG_FATAL(...) LOG(FATAL) << __VA_ARGS__
+#define FLOG_ERROR(...) LOG(ERROR) << __VA_ARGS__
+#define FLOG_WARN(...) LOG(WARNING) << __VA_ARGS__
+#define FLOG_INFO(...) LOG(INFO) << __VA_ARGS__
+#define FVLOG1(...) VLOG(1) << __VA_ARGS__
+#define FVLOG2(...) VLOG(2) << __VA_ARGS__
+#define FVLOG3(...) VLOG(3) << __VA_ARGS__
+#define FVLOG4(...) VLOG(4) << __VA_ARGS__
+
 #include "base/ThriftTypes.h"
 
 #endif
