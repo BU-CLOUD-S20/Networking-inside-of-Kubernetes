@@ -1,0 +1,60 @@
+version: '3.4'
+
+services:
+  node1:
+    image: freddiefy/ec528networking-dev:v1
+    container_name: node1
+    hostname: node1
+    privileged: true
+    environment: 
+      USER: root
+    ports: 
+      - 8001
+    expose:
+      - "8001"
+    networks:
+      niok-net:
+        ipv4_address: 172.28.1.1
+    tty: true
+    entrypoint: /bin/bash
+
+  node2:
+    image: freddiefy/ec528networking-dev:v1
+    container_name: node2
+    hostname: node2
+    privileged: true
+    environment: 
+      USER: root
+    ports: 
+      - 8001
+    expose:
+      - "8001"
+    networks:
+      niok-net:
+        ipv4_address: 172.28.1.2
+    tty: true
+    entrypoint: /bin/bash
+  
+  node3:
+    image: freddiefy/ec528networking-dev:v1
+    container_name: node3
+    hostname: node3
+    privileged: true
+    environment: 
+      USER: root
+    ports: 
+      - 8001
+    expose:
+      - "8001"
+    networks:
+      niok-net:
+        ipv4_address: 172.28.1.3
+    tty: true
+    entrypoint: /bin/bash
+
+networks:
+  niok-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16

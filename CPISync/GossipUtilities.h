@@ -1,5 +1,5 @@
 /*
-*   A class of useful static methods for using CPISync with leveldb.
+*   Useful static methods and Node class for using CPISync with leveldb.
 *   Zhe Deng Networking Inside of Kubernetes EC528 Spring 2020
 */
 
@@ -17,22 +17,28 @@ using std::string;
 
 namespace niok
 {
+//Node class
+class Node
+{
+public:
+//delete db to prevent memory leaks as well as to pass leveldb status.ok()
+string name, key;
+DB* db = nullptr;
+~Node()
+{
+delete db;
+}
+void init(string nodeName, string key, string initialElems, GenSync& genSync);
+void connect(GenSync& genSync);
+void listen(GenSync& genSync);
+};
+//static methods
 class Gossip
 {
 public:
-    static inline string getElems(GenSync &genSync)
-    {
-        string str;
-        for (string dop : genSync.dumpElements())
-        {
-            //print char data in proper format and save to 'str'
-            char data = (char)(((int)dop[0])+2);
-            cout<< data << " ";
-            str.push_back(data);
-        }
-        cout << endl;
-        return str;
-    }
+    //returns all char elements of 'genSync' in the form of a string and prints the elements
+    static string getElems(GenSync &genSync);
+    //saves each char of 'elems' in 'genSync'
     static inline void putElems (GenSync &genSync, string elems)
     {
         for (int i = 0; i < elems.length(); ++i)
@@ -40,6 +46,7 @@ public:
              genSync.addElem(make_shared<DataObject>(elems[i]));
         }
     }
+    //returns pointer to a DB given the string 'name'
     static inline DB* getDB(string name)
     {
         DB *db = nullptr;
@@ -49,18 +56,7 @@ public:
         assert(status.ok());
         return db;
     }
-    static inline void getNodeValues(vector<string> nodes, string key)
-    {
-        string s;
-        cout << "Current value of key '" << key << "' for all nodes:" <<endl;
-        for (int i =0; i<nodes.size(); ++i)
-        {
-            DB *db = nullptr;
-            db = getDB(nodes[i]);
-            db->Get(ReadOptions(), key, &s);
-            cout<< nodes[i] << ": " << s << endl;
-            delete db;
-        }
-    }
+    //prints out all nodes' values corresponding to key 'key'
+    static void getNodeValues(vector<string> nodes, string key);
 };
 }

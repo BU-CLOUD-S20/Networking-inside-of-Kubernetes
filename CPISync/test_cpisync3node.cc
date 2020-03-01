@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
                       setProtocol(GenSync::SyncProtocol::InteractiveCPISync).
                       setComm(GenSync::SyncComm::socket).
                       setPort(PORT).
+                      setHost("172.28.1.1").
                       setErr(ERR).
                       setMbar(M_BAR).
                       setBits(BITS * sizeof(char)).
@@ -44,66 +45,26 @@ int main(int argc, char *argv[])
     //==============================================================================================
     //sync current server-client pair
     const string key = "001";
-    Gossip::getNodeValues({"node1","node2","node3"}, key);
-    if (strcmp(argv[1], "1")==0)
+    string name = "node";
+    name.append(argv[1]);
+  //  Gossip::getNodeValues({"node1","node2","node3"}, key);
+    if (NODE==1)
     {
-        DB* db = Gossip::getDB("node1");
-        string s;
-        db->Get(ReadOptions(), key, &s);
-        if (s.length()==0)
-        {
-            cout << "init node1 data: " <<endl;
-            Gossip::putElems(genSync, "abcef");
-            db->Put(WriteOptions(), key, Gossip::getElems(genSync));
-        } else {
-            Gossip::putElems(genSync, s);
-            cout << "current node1 data: " <<endl;
-            Gossip::getElems(genSync);
-        }
-        cout << "connecting on port " << PORT << "..." << endl;
-        genSync.serverSyncBegin(0);
-        cout << "synced node1 data: " <<endl;
-        db->Put(WriteOptions(), key, Gossip::getElems(genSync));
-        delete db;
-    }
-    else if(strcmp(argv[1], "2")==0)
-    {
-       DB* db = Gossip::getDB("node2");
-        string s;
-        db->Get(ReadOptions(), key, &s);
-        if (s.length()==0)
-        {
-            cout << "init node2 data: " <<endl;
-            Gossip::putElems(genSync, "abcd");
-            db->Put(WriteOptions(), key, Gossip::getElems(genSync));
-        } else {
-            Gossip::putElems(genSync, s);
-            cout << "current node2 data: " <<endl;
-            Gossip::getElems(genSync);
-        }
-        cout << "listening on port " << PORT << "..." << endl;
-        genSync.clientSyncBegin(0);
-        cout << "synced node2 data: " <<endl;
-        db->Put(WriteOptions(), key, Gossip::getElems(genSync));
-        delete db;
+        niok::Node server;
+        server.init(name, key, "abcef", genSync);
+        server.connect(genSync);
     }
     else
     {
-        DB* db = Gossip::getDB("node3");
-        string s;
-        db->Get(ReadOptions(), key, &s);
-        if (s.length()==0)
+        niok::Node client;
+        switch(NODE)
         {
-            Gossip::putElems(genSync, "abcg");
-            db->Put(WriteOptions(), key, Gossip::getElems(genSync));
-        } else {
-            Gossip::putElems(genSync, s);
-            Gossip::getElems(genSync);
+            case(2):
+                client.init(name, key, "abcd", genSync);
+            break;
+            default:
+            client.init(name, key, "abcg", genSync);
         }
-        cout << "listening on port " << PORT << "..." << endl;
-        genSync.clientSyncBegin(0);
-        db->Put(WriteOptions(), key, Gossip::getElems(genSync));
-        cout << "sync succeeded." << endl;
+        client.listen(genSync);
     }
-
 }
