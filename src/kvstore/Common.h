@@ -1,10 +1,10 @@
 #ifndef KVSTORE_COMMON_H_
 #define KVSTORE_COMMON_H_
 
-#include "base/Base.h"
+#include "../common/base/Base.h"
 
 namespace niok {
-namespace kvstorage {
+namespace kvstore {
 
 enum ResultCode {
     SUCCEEDED               = 0,
@@ -15,7 +15,7 @@ enum ResultCode {
 };
 
 inline leveldb::Slice toSlice(const std::string& str) {
-    return leveldb::Slice(str.begin(), str.size());
+    return leveldb::Slice(str);
 }
 
 } // namespace kvstorage
