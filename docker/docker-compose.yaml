@@ -12,6 +12,8 @@ services:
       - 8001
     expose:
       - "8001"
+    volumes:
+      - ../../Networking-inside-of-Kubernetes:/root/project
     networks:
       niok-net:
         ipv4_address: 172.28.1.1

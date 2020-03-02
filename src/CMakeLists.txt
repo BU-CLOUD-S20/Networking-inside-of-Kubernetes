@@ -1,0 +1,1 @@
+niok_add_subdirectory(kvstore)

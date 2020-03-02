@@ -9,6 +9,68 @@
 @ Geng Song   
 @ [Zhou Shen](https://github.com/zhou-1)  	   
 
+## 0. Get started
+- Firstly, clone the project
+
+  ```bash
+  git clone https://github.com/BU-CLOUD-S20/Networking-inside-of-Kubernetes.git
+  cd Networking-inside-of-Kubernetes
+  ```
+
+- Then move to docker folder, and run the following commands to run a container of our image. Then get into the container, move to /root/project/ directory which is the work directory.
+
+  ```bash
+  cd docker/
+  docker run -it --name 528dev -v <your local path to this project>/Networking-inside-of-Kubernetes/:/root/project/ freddiefy/ec528networking-dev:v1 /bin/bash
+  ```
+
+- To build the project:
+
+  ```bash
+  mkdir build
+  cd build
+  cmake ..
+  cmake --build .
+  ```
+
+- Then if you want to run unit tests:
+
+  ```bash
+  root@69870374073e:~/project/build# ctest
+  Test project /root/project/build
+      Start 1: level_engine_test
+  1/1 Test #1: level_engine_test ................   Passed    0.02 sec
+  
+  100% tests passed, 0 tests failed out of 1
+  
+  Label Time Summary:
+  kvstore    =   0.02 sec*proc (1 test)
+  
+  Total Test time (real) =   0.11 sec
+  ```
+
+- Or directly using the specific test you want to run:
+
+  ```bash
+  root@69870374073e:~/project/build# src/kvstore/test/_build/level_engine_test
+  [==========] Running 2 tests from 1 test case.
+  [----------] Global test environment set-up.
+  [----------] 2 tests from LevelEngineTest
+  [ RUN      ] LevelEngineTest.SimpleTest
+  keyval
+  Release leveldb on /tmp/leveldb_engine_SimpleTest.XXXXXX0
+  [       OK ] LevelEngineTest.SimpleTest (10 ms)
+  [ RUN      ] LevelEngineTest.RemoveTest
+  keyval
+  Get: key Not Found
+  Release leveldb on /tmp/rocksdb_engine_RemoveTest.XXXXXX0
+  [       OK ] LevelEngineTest.RemoveTest (5 ms)
+  [----------] 2 tests from LevelEngineTest (15 ms total)
+  
+  [----------] Global test environment tear-down
+  [==========] 2 tests from 1 test case ran. (15 ms total)
+  [  PASSED  ] 2 tests.
+  ```
 ## 1. Vision and Goals Of The Project
 Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client.      
 Disadvantage of current Raft algorithm is obvious that not able to scale which causes the speed to reply to the client is slow.     
