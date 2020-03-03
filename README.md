@@ -119,11 +119,13 @@ This practical set reconciliation algorithm will be replacing the Raft consensus
 
 ## 5. Acceptance criteria
 Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:    
-+ Deploying our implementation of the gossip protocol using [CPISync][5] and [LevelDB][6] to containers     
++ Deploying our implementation of the gossip protocol using [CPISync](5) and [LevelDB](6) to containers     
 + Shortening the time to respond to client request and benchmarking our implementation against etcd    
 + Detecting failures during networking
+
 [5]: https://github.com/trachten/cpisync
 [6]: https://github.com/google/leveldb
+
 ## 6. Release Planning
 
 - **First Step** (1~2 weeks)
