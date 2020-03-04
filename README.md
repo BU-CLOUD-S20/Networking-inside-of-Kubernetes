@@ -1,13 +1,13 @@
 # Networking-inside-of-Kubernetes   
 
 ## Contributors:   
-@ Anish Gupta    
-@ Bowen Song    
-@ Alexander Trinh	    
-@ Fuyao Wang	  
-@ Zhe Deng    
-@ Geng Song   
-@ [Zhou Shen](https://github.com/zhou-1)  	   
+@ [Anish Gupta] (github.com/nkanish2002)   
+@ [Bowen Song] (github.com/Bowenislandsong)
+@ [Alexander Trinh] (github.com/aktrinh17)	    
+@ [Fuyao Wang] (github.com/wfystx)	  
+@ [Zhe Deng] (github.com/thezhe)    
+@ [Geng Song] (github.com/827265717)   
+@ [Zhou Shen](github.com/zhou-1)  	   
 
 ## 0. Get started
 - Firstly, clone the project
