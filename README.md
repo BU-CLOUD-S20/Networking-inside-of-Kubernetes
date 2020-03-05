@@ -120,12 +120,11 @@ Design Implications and Discussion:
 This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.       
 
 ## 5. Acceptance criteria
-Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:    
-+ Deploying our implementation of the gossip protocol using [CPISync](5) and [LevelDB](6) to containers     
+Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. 
+Stretch goals are:    
++ Deploying our implementation of the gossip protocol using [CPISync](https://github.com/trachten/cpisync) and [LevelDB](https://github.com/google/leveldb) to containers     
 + Detecting failures during networking
-+ Integrate our database into etcd and run with Kubernetes.
-[5]: https://github.com/trachten/cpisync
-[6]: https://github.com/google/leveldb  
++ Integrate our database into etcd and run with Kubernetes.  
 ## 6. Release Planning
 - **First Step** (1~2 weeks)
   - Understand the basics of C++ and Gossip Protocol 
