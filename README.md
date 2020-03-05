@@ -74,7 +74,7 @@ Team:
   [  PASSED  ] 2 tests.
   ```
 ## 1. Vision and Goals Of The Project
-Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes, and Etcd currently uses the Raft consensus algorithm which first updates go to a leader, then distributes updates to at least a majority of other Etcd cluster members before replying to the client.      
+Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes. Etcd implements the Raft consensus algorithm which relies on a leader node to distribute updates to a majority of other Etcd cluster  before replying to the client.      
 The Raft algorithm is not able to scale due to its single leader node architecture and causes slow replies to the client.     
 Therefore, high level  goal of our projects is creating an alternative to the Raft algorithm with a bandwidth-efficient and faster “gossip protocol” which will include:    
 + A fast, stable algorithm that reply to the client in a shorter time. We assume a success when the neighbors of a node are written to.     
@@ -122,34 +122,27 @@ This practical set reconciliation algorithm will be replacing the Raft consensus
 ## 5. Acceptance criteria
 Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. Stretch goals are:    
 + Deploying our implementation of the gossip protocol using [CPISync](5) and [LevelDB](6) to containers     
-+ Shortening the time to respond to client request and benchmarking our implementation against etcd    
 + Detecting failures during networking
-
++ Integrate our database into etcd and run with Kubernetes.
 [5]: https://github.com/trachten/cpisync
-[6]: https://github.com/google/leveldb
-
+[6]: https://github.com/google/leveldb  
 ## 6. Release Planning
-
 - **First Step** (1~2 weeks)
-  - Team members should have the basics of C++ and Gossip Protocol. 
-  - Everyone should also get familiar with etcd's source code and architecture.
-  - Meantime, discuss about how consensus protocol(Raft) works in etcd and what information should be synchronized between instances to perform updates.
+  - Understand the basics of C++ and Gossip Protocol 
+  - Get familiar with etcd's architecture
+  - Learn how consensus protocol(RAFT) and what information syncs between nodes
 - **Release 1** (1~2 weeks)
-  - A simple implementation of reconciling information between two instances of the new database. 
-  - LevelDB, the key-value storage, CPIsync library, more specifically the interactive CPIsync, should be used to achieve this.
+  - Implementation a simple example of Gossip reconciliation between two instances 
+  - Utilize LevelDB and CPIsync (more specifically Interactive CPIsync)
 - **Release 2** (4~6 weeks)
-  - Codes related to updating the key value store and logs (code piece such as electing leader, heatbeating) in etcd should be swapped out.
-  - Implement gossip protocol to synchronize data between nodes.
-  - Test cases are also expected to come together.
+  - Define how logging works in our implementation
+  - Implement gossip protocol to synchronize data multiple nodes
+  - Write tests and benchmarks for both databases
 - **Release 3** (1 week)
-  - Debug done, the new system should work.
-- **Final Step** (Hopefully) (Class ends)
-  - Use the stable released version to replace the metadata storage in Kubernetes.
+  - Debug and test some more
+  - Work on stretch goals
 
 ## 7. Risks   
 Potential risks for our project:   
 + Our implementation is not scalable.    
 + Our algorithm may not be able to have enough consistency or reliability to offer a legitimate alternative to the Raft algorithm
-
-## General comments
-Before implementing “gossip protocol”, the first step is to get practical set reconciliation between two instances, then test its performances in small groups in comparison to Raft. The result might be little in differences when group size is small, then we record the performance as an enlarging set.
