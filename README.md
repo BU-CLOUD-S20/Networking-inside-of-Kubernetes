@@ -73,22 +73,22 @@ Team:
   [==========] 2 tests from 1 test case ran. (15 ms total)
   [  PASSED  ] 2 tests.
   ```
+  
 ## 1. Vision and Goals Of The Project
-Etcd is a distributed database that stores concurrent cluster metadata such as node information inside of Kubernetes. Etcd implements the Raft consensus algorithm which relies on a leader node to distribute updates to a majority of other Etcd cluster  before replying to the client.      
-The Raft algorithm is not able to scale due to its single leader node architecture and causes slow replies to the client.     
-Therefore, high level  goal of our projects is creating an alternative to the Raft algorithm with a bandwidth-efficient and faster “gossip protocol” which will include:    
-+ A fast, stable algorithm that reply to the client in a shorter time. We assume a success when the neighbors of a node are written to.     
-+ Use “gossip protocol” that sync to neighbouring nodes directly (set up “practical set reconciliation”) instead of updating to leader node first     
-+ Enabling an eventually consistent service with minimal cost performance for large scale clusters     
+etcd is a distributed database that stores master node metadata inside of Kubernetes. etcd implements the RAFT consensus protocol which relies on a leader instance to distribute updates to a majority of follower instances for every sync. Unfortunately, this approach is not scalable. Using an alternative protocol saves the cost of time to leader election and log replication for opertions like 'put' (write) for large clusters.  
+
+We plan to create an time efficient and scalable distriuted database using the “gossip protocol” via the following design decisions:    
++ Set reconciliation between neighbors. That is, nodes will only sync log differences with their neighbors.
++ High Availability. We assume success when neightbor nodes are synced.     
++ Log entries are idempotent and data reflects the latest log entry. We assume time is synced via an atomic clock.   
 
 ## 2. Users/Personas Of The Project
-The modified version of Etcd targets Kubernetes developers and large clusters (much more than the [current usable limit of 1000][1] nodes in magnitude) that depend on Etcd for handling metadata and coordination. The gossip protocol accommodates hardware and design limitations (e.g. [hard disk speed][2], restricted cache availability) by reducing redundant writes.     
-
+Our database targets Kubernetes developers using large clusters ([>> 1000 nodes in magnitude][1]). The gossip protocol accommodates hardware and design limitations (e.g. [hard disk speed][2], restricted cache availability) by reducing redundant writes and leader bottlenecks.     
 This project will NOT:    
 + Target end-users of Kubernetes  
-+ Replace RAFT in Etcd
-+ Handle data that cannot tolerate eventual consistency    
-+ Store [more than a few gigabytes] of data[3] (>8 GB) of data (use NewSQL instead)
++ Replace RAFT in etcd
++ Sync time-sensitive data which requires strong consistency    
++ Store [more than a few gigabytes][3] of data (>8 GB) of data
 + Target [Horizontally scaling databases][4] (>1 cluster)
 
 [1]: https://github.com/kubernetes/kubernetes/issues/20540
@@ -97,39 +97,41 @@ This project will NOT:
 [4]: https://github.com/etcd-io/etcd/blob/master/Documentation/learning/why.md
 
 ## 3. Scope and Features Of The Project
-The scope of the project aims at large scale metadata stored in Etcd which need to be updated in time. Instead of Raft consensus algorithm, gossip protocol discards the “leader approach” and saves the cost of time to leader election and. Having one leader create a one point of failure not to mention that the leader has to communicate with all nodes for an update. Failure detection guarantee the reliability of the network from periodically pinging each node by its neighbors, which mitigates the  average error rate during the process of handshake.
+Our implementation will use the CPISync library to implement set reconciliation between neighbors nodes' logs. Furthermore, garbage collection can piggyback on these pings to remove old log entries.
 
-Therefore, the main features are:
-- Handling updates across global metadata in higher speed by gossip protocol
-- Responding to client requests quicker 
-- Failure detection ensures the robustness and reliability of the network
+We plan to implement a transparent API that is consistent with a subset of etcd's API:
+
+We are implementing:
+-put
+-get
+-del
+
+We plan to implement (subject to change):
+-snapshot
+-watch
+-member add/remove
 
 ## 4. Solution Concept:
 A high-level outline of the solution:     
 Global Architectural Structure of the Project:      
 
-![projectDiagram](images/Project_Diagram.png)
-
-This diagram illustrates our global architectural design for the project. The Cluster is depicted as being updated with new information from the user. Each worker node is then shown communicating and updating its neighboring nodes. This information then propagates throughout the entire cluster, thus completing reconciliation using a “gossip protocol”. 
-
 ![alt text](https://upload-images.jianshu.io/upload_images/1452123-09556716dc29be12.gif?imageMogr2/auto-orient/strip|imageView2/2/format/gif)    
-
-This gif illustrates the "gossip protocol" we are trying to implement. The idea is to have a node receive some sort of update, and having it communicate with its neighboring nodes. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved.
-
-Design Implications and Discussion:      
-This practical set reconciliation algorithm will be replacing the Raft consensus algorithm. Raft makes use of a master node which distributes updates to its cluster of nodes. While this algorithm is fairly consistent, it fails to remain efficient as the number of nodes scales up, e.g. large scale clusters with over 5000+ nodes. As a result, our gossip protocol based algorithm will solve the issue of inefficiency with large scale environments, at the cost of consistency.       
+This gif illustrates the "gossip protocol" we are trying to implement. When a node receives a request, it updates its log and then sends it to its neighbors to reconcile. In this gif, once node 1 reconciles with its neighbors (2, 4, and 7), any client communicating with node 1 will see their request as a success. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved.       
 
 ## 5. Acceptance criteria
-Minimum acceptance criteria is that compared with current Raft algorithm, creating a faster and stable algorithm with “gossip protocol”. 
-Stretch goals are:    
-+ Deploying our implementation of the gossip protocol using [CPISync](https://github.com/trachten/cpisync) and [LevelDB](https://github.com/google/leveldb) to containers     
++ Deploying our C++ implementation of the gossip protocol using [CPISync](https://github.com/trachten/cpisync) and [LevelDB](https://github.com/google/leveldb) to containers 
++ Benchmarking our database against etcd to demonstrate significant scalability and performance improvements.
++ Garbage collection for old log entries
+
+## 6. Stretch Goals 
 + Detecting failures during networking
 + Integrate our database into etcd and run with Kubernetes.  
-## 6. Release Planning
+
+## 7. Release Planning
 - **First Step** (1~2 weeks)
   - Understand the basics of C++ and Gossip Protocol 
   - Get familiar with etcd's architecture
-  - Learn how consensus protocol(RAFT) and what information syncs between nodes
+  - Learn how consensus protocol (RAFT) and what information syncs between nodes
 - **Release 1** (1~2 weeks)
   - Implementation a simple example of Gossip reconciliation between two instances 
   - Utilize LevelDB and CPIsync (more specifically Interactive CPIsync)
@@ -141,7 +143,7 @@ Stretch goals are:
   - Debug and test some more
   - Work on stretch goals
 
-## 7. Risks   
+## 8. Risks   
 Potential risks for our project:   
-+ Our implementation is not scalable.    
-+ Our algorithm may not be able to have enough consistency or reliability to offer a legitimate alternative to the Raft algorithm
++ Our implementation is not scalable. We do not know how well CPISync handles many long logs.
++ Our implementation may not have enough consistency or reliability to demonstrate a legitimate alternative to RAFT.
