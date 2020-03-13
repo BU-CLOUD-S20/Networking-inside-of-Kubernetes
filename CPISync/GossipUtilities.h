@@ -1,5 +1,5 @@
 /*
-*   Useful static methods and Node class for using CPISync with leveldb.
+*   Useful static methods for using CPISync with leveldb.
 *   Zhe Deng Networking Inside of Kubernetes EC528 Spring 2020
 */
 
@@ -17,22 +17,6 @@ using std::string;
 
 namespace niok
 {
-//Node class
-class Node
-{
-public:
-//delete db to prevent memory leaks as well as to pass leveldb status.ok()
-string name, key;
-DB* db = nullptr;
-~Node()
-{
-delete db;
-}
-void init(string nodeName, string key, string initialElems, GenSync& genSync);
-void connect(GenSync& genSync);
-void listen(GenSync& genSync);
-};
-//static methods
 class Gossip
 {
 public:

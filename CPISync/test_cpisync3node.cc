@@ -3,9 +3,8 @@
 * Zhe Deng Networking Inside of Kubernetes EC528 Spring 2020
 */
 
-#include "GossipUtilities.h"
+#include "GossipNode.h"
 
-using namespace leveldb;
 using namespace niok;
 using std::cout;
 using std::endl;
@@ -50,13 +49,13 @@ int main(int argc, char *argv[])
   //  Gossip::getNodeValues({"node1","node2","node3"}, key);
     if (NODE==1)
     {
-        niok::Node server;
+        GossipNode server;
         server.init(name, key, "abcef", genSync);
         server.connect(genSync);
     }
     else
     {
-        niok::Node client;
+        GossipNode client;
         switch(NODE)
         {
             case(2):
