@@ -20,12 +20,12 @@ namespace niok
 class Gossip
 {
 public:
-    //returns all char elements of 'genSync' in the form of a string and prints the elements
-    static string getElems(GenSync &genSync);
-    //saves each char of 'elems' in 'genSync'
-    static inline void putElems (GenSync &genSync, string elems)
+    //returns all strings in'genSync' and prints them
+    static vector<string> getElems(GenSync &genSync);
+    //saves each string of 'elems' in 'genSync'
+    static inline void putElems (vector<string> elems, GenSync &genSync)
     {
-        for (int i = 0; i < elems.length(); ++i)
+        for (int i = 0; i < elems.size(); ++i)
         {
              genSync.addElem(make_shared<DataObject>(elems[i]));
         }
@@ -40,7 +40,5 @@ public:
         assert(status.ok());
         return db;
     }
-    //prints out all nodes' values corresponding to key 'key'
-    static void getNodeValues(vector<string> nodes, string key);
 };
 }

@@ -11,14 +11,18 @@ namespace niok
 class GossipNode
 {
 public:
-//delete db to prevent memory leaks as well as to pass leveldb status.ok()
-string name, key;
+//Metadata
+string name;
+vector <string> log;
+vector <string> neighbors;
+//Data
 DB* db = nullptr;
+//delete db to prevent memory leaks as well as to pass leveldb status.ok()
 ~GossipNode()
 {
 delete db;
 }
-void init(string nodeName, string key, string initialElems, GenSync& genSync);
+void init(string nodeName, vector<string> initialElems, GenSync& genSync);
 void connect(GenSync& genSync);
 void listen(GenSync& genSync);
 };
