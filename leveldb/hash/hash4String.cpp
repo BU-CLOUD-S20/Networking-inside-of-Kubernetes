@@ -11,25 +11,25 @@
 #define F 37 /* also prime, F means FIrst */
 
 // have hashing functions involving primes
-void hash(std::string longStr) {
-
-  int seed = 131; 
+unsigned hash(std::string longStr) {
   
   unsigned temp = F;
   
   for(int i = 0; i < longStr.length(); i++) {
-    temp = (temp * A) + B;
+    temp = (temp * A) + B * int(longStr[i]);
   }
   
   auto ans = temp % C;
 
-  std::cout << ans << std::endl;
+  // std::cout << typeid(ans).name() << std::endl; // j, unsigned
+  return ans;
 }
 
 int main() {
   std::string longStr = "abcdefghijklmnopqrstuvwxyz111";
 
-  hash(longStr);
+  unsigned res = hash(longStr);
+  std::cout << res << std::endl;
 
   return 0;
 }
