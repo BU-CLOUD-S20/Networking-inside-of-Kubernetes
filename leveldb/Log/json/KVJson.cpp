@@ -57,7 +57,9 @@ void newKeyValJson(std::string key, std::string val) {
 
   // add another object (using an initializer list of pairs)
   // i.e. j["object"] = { {"currency", "USD"}, {"value", 42.99} };
-  j[std::to_string(logID)] = { val, std::string(std::ctime(&end_time)) };
+  // j[std::to_string(logID)] = { val, std::string(std::ctime(&end_time)) };
+  // key is time of log; val is val and logID
+  j[std::string(std::ctime(&end_time))] = { val, std::to_string(logID) };
   
   std::cout << j << std::endl;
 }
