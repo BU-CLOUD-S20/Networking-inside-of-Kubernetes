@@ -15,8 +15,9 @@ using std::cout;
 using std::endl;
 using std::string;
 
-namespace niok
-{
+namespace niok {
+namespace cpisync {
+
 class Gossip
 {
 public:
@@ -41,4 +42,6 @@ public:
         return db;
     }
 };
-}
+
+} // namespace cpisync
+} // namespace niok
