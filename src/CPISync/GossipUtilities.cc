@@ -1,7 +1,7 @@
 #include "GossipUtilities.h"
 
-namespace niok
-{
+namespace niok {
+namespace cpisync{
 vector<string> Gossip::getElems(GenSync &genSync)
 {
     vector<string> res;
@@ -13,4 +13,6 @@ vector<string> Gossip::getElems(GenSync &genSync)
     cout << endl;
     return res;
 }
-}
+
+} // namespace cpisync
+} // namespace niok
