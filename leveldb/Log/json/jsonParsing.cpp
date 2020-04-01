@@ -1,45 +1,65 @@
-// warm remind: gcc KVJson.cpp -lstdc++ -o KVJson
-// difficult with GCC: https://en.wikibooks.org/wiki/JsonCpp
-
-// Use another single file
-
 #include <iostream>
 #include <chrono>
 #include <ctime> 
-#include <typeinfo>       // operator typeid
-#include <string>     // to use std::string, std::to_string() and "+" operator acting on strings 
+#include <typeinfo>       
+#include <string>  
+#include <sstream>    
 #include <fstream>
 #include "json.hpp"
-//#include <nlohmann/json.hpp>
 
 using namespace std;
+using json = nlohmann::json;
 
+/*
+  Still need to implement accurate timestamping for keys
+*/
 
-// logID will increase by itself for each new log come in
-int logID = 1;
+// returns a value from a given key 
+string getValueFromKey(string file, string key) {
+  // read in the file
+  ifstream test(file);
+  stringstream buffer;
+  buffer << test.rdbuf();
 
-int readFile(string file, string key) {
-  ifstream log(file);
-  nlohmann::json j;
-  log >> j;
+  // make a json object out of the file contents
+  // and return the value for the given key
+  json j;
+  j = json::parse(buffer.str());
 
-  cout << j[key];
-
-  return 1;
+  return j[key].dump();
 }
 
-int outputToFile(nlohmann::json j) {
+// adds a new log with key and value to a file
+int addLogToFile(string file, string key, string value) {
+
+  // read in the file
+  ifstream test(file);
+  stringstream buffer;
+  buffer << test.rdbuf();
+
+  // make a json object out of the file contents
+  // and append a new key and value
+  json j;
+  if (!buffer.str().empty()) {
+    j = json::parse(buffer.str());
+  }
+
+  j[key] = { value };
+
+  // output the appended json object to the file
   ofstream log;
-  log.open ("exampleLog.json", ios_base::app);
-  log << j << "\n";
+  log.open(file);
+  log << j;
   log.close();
+
   return 1;
 }
 
-int printFile() {
+// prints the contents of a file 
+int printFileContents(string file) {
   string line;
-  ifstream log ("exampleLog.json");
-  nlohmann::json j;
+  ifstream log (file);
+  json j;
 
   if (log.is_open()) {
     while (getline (log, line)) {
@@ -52,53 +72,13 @@ int printFile() {
   return 0;
 }
 
-nlohmann::json newKeyValJson(string key, string val) {
-  // prepare a final string
-  std::string newLog;
+// creates a new json object with given key and value
+json createNewJson(string key, string val) {
 
-  // get current time
-  auto end = std::chrono::system_clock::now();
-  std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-
-  // create an empty structure (null)
-  nlohmann::json j;
-
-  // add another object (using an initializer list of pairs)
-  // i.e. j["object"] = { {"currency", "USD"}, {"value", 42.99} };
-  // j[std::to_string(logID)] = { val, std::string(std::ctime(&end_time)) };
-  // key is time of log; val is val and logID
-  //j[string(ctime(&end_time))] = { val, to_string(logID) };
-  key = string(ctime(&end_time))
-
-  j[key] = { val, to_string(logID) };
-
-  std::cout << j << std::endl;
-  return j;
-}
-
-// Basic test, only 2 calls
-// We can add for loop for more tests
-int main() {
-  int numofLog = 5;
+  string newLog;
+  json j;
   
-  for(int i = 0; i < numofLog; i++) {
-    string keyString = "key of Client" + std::to_string(i);
-    string valString = "value from Client" + std::to_string(i);
-    //outputToFile(newKeyValJson(keyString, valString));
-    logID++;
-  }
-  printFile();
-  cout << "\n";
-  readFile("exampleLog.json", "Thu Mar 26 20:44:27 2020\n");
+  j[key] = { val };
 
-  /*
-  nlohmann::json test;
-  test["Hello"] = "World";
-  test["pepper"] = "oni";
-
-  cout << test << '\n';
-  cout << test["pepper"];
-  */
-
-  return 0;
+  return j;
 }
