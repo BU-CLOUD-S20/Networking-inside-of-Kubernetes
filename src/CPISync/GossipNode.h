@@ -4,73 +4,44 @@
 */
 
 #pragma once
-#include <iostream>
-#include <string>
-#include <leveldb/db.h>
-#include <CPISync/Syncs/GenSync.h>
-#include <CPISync/Data/DataObject.h>
+#include "GossipUtilities.h"
+#include "../kvstore/KVEngine.h"
+#include "../kvstore/LevelEngine.h"
 
-using namespace NTL;
-using namespace leveldb;
-using std::cout;
-using std::endl;
-using std::string;
+namespace niok {
+namespace cpisync {
 
-namespace niok
-{
 class GossipNode
 {
 public:
-//Metadata
-    string name;
-    hash<string> strHash;
-    vector <string> log;
-    vector <string> neighbors;
-    DB* hashDefs = nullptr; //use a map in final version
-    // map<string, string> hashDefs;
-//map <string, string> hashDefs;
-//Data
-    DB* db = nullptr;
-//initialize node using a hash function
-    GossipNode(hash<string> hashFunc)
-    {
-        strHash = hashFunc;
-        //  hashDefs = getDB("hashDefs");
+    //Metadata
+    string name_;
+    //Constructors
+    GossipNode(){}
+    GossipNode(string nodeName, int spaceId, string path) {
+        name_ = nodeName;
+        rootPath_ = path;
+        db_ = new kvstore::LevelEngine(spaceId, rootPath_);
     }
-//delete db to prevent memory leaks as well as to pass leveldb status.ok()
+    //delete db to prevent memory leaks as well as to pass leveldb status.ok()
     ~GossipNode()
     {
-        delete db;
+        delete db_;
     }
-    //main methods
     void init(string nodeName, vector<string> initialElems, GenSync& genSync);
     void connect(GenSync& genSync);
     void listen(GenSync& genSync);
 
+    bool get(const std::string& key, std::string* value);
+
+    bool put(std::string key, std::string value);
+
 private:
-int EOL = 0;
+    vector <string> log_;
+    vector <string> neighbors_;
+    kvstore::LevelEngine* db_;
+    string rootPath_;
+}; 
 
-
-//helper functions
-    DB* getDB(string name)
-    {
-        retry:
-        DB *db = nullptr;
-        Options op;
-        op.create_if_missing = true;
-        Status status = DB::Open(op, name, &db);
-        if (!status.ok())
-        {
-            usleep (50000);
-            goto retry;
-        }
-        return db;
-    }
-    //gets diff from last sync
-    void getDiff(GenSync &genSync);
-    //gets all elements
-    void getElems(GenSync &genSync);
-    //prints all elements in log
-    void getLog();
-};
-}
+} //namespace cpisync
+} //namespace niok

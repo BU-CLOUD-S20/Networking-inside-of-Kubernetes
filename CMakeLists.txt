@@ -32,7 +32,23 @@ if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif()
 
 find_package(Leveldb REQUIRED)
+# find_package(GMP REQUIRED)
 
+include_directories(/usr/local/include)
+link_directories(/usr/local/lib)
+link_directories(/usr/local/lib64)
+
+macro(niok_link_libraries target)
+    target_link_libraries(
+        ${target}
+        leveldb
+        gtest_main
+        ntl
+        cpisync
+        gmp
+        -pthread
+    )
+endmacro(niok_link_libraries)
 
 macro(niok_add_executable)
     cmake_parse_arguments(
@@ -61,7 +77,6 @@ macro(niok_add_test)
         "SOURCES;OBJECTS;LIBRARIES" # <multi_value_args>
         ${ARGN}
     )
-
     niok_add_executable(
         NAME ${niok_test_NAME}
         SOURCES ${niok_test_SOURCES}
@@ -78,15 +93,6 @@ macro(niok_add_test)
     endif()
 endmacro()
 
-macro(niok_link_libraries target)
-    target_link_libraries(
-        ${target}
-        leveldb
-        gtest_main
-        -pthread
-    )
-endmacro(niok_link_libraries)
-
 macro(niok_add_library name type)
     add_library(${name} ${type} ${ARGN})
 endmacro()
@@ -100,6 +106,7 @@ endfunction()
 
 set(LEVELDB_LIBRARIES ${Leveldb_LIBRARY})
 set(GOOGLETEST_LIBRARIES ${Googletest_LIBRARY})
+set(GMP_LIBRARIES ${GMP_LIBRARY})
 
 add_custom_target(
     clean-build
@@ -131,4 +138,4 @@ include(cmake/googletest.cmake)
 fetch_googletest(
     ${PROJECT_SOURCE_DIR}/cmake
     ${PROJECT_BINARY_DIR}/googletest
-    )
+)

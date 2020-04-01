@@ -1,1 +1,2 @@
 niok_add_subdirectory(kvstore)
+niok_add_subdirectory(CPISync)
