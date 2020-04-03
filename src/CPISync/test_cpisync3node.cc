@@ -4,8 +4,10 @@
 */
 
 #include "GossipNode.h"
+#include <memory.h>
 
 using namespace niok;
+using namespace cpisync;
 using std::cout;
 using std::endl;
 using std::string;
@@ -22,52 +24,30 @@ int main(int argc, char *argv[])
         exit (EXIT_FAILURE);
     }
     //==============================================================================================
-    //setup genSync
-    const int PORT = 8001; // port on which to connect
-    const int ERR = 8; // inverse log of error chance
-    const int M_BAR = 1; // max differences between server and client
-    const int PARTS = 3; // partitions per level for partition-syncs
-    const int EXP_ELTS = 4; // expected number of elements per set
-    const int METHOD = 0; // index of method to sync
-    //noik parameters
-    const int BITS = 134; //max val is 134
-    const string HOST = "172.28.1.1";//host to use for docker
-    GenSync genSync = GenSync::Builder().
-                      setProtocol(GenSync::SyncProtocol::InteractiveCPISync).
-                      setComm(GenSync::SyncComm::socket).
-                      setPort(PORT).
-                      setHost(HOST).
-                      setErr(ERR).
-                      setMbar(M_BAR).
-                      setBits(BITS).
-                      setNumPartitions(PARTS).
-                      setExpNumElems(EXP_ELTS).
-                      build();
-    //define hash function
-    hash<string> strHash;
-    //==============================================================================================
     //sync current server-client pair
+    const string HOST = "172.28.1.1";
+    const int NUM_CHAR = 20;
+    hash<string> strHash;
     string name = "node";
     name.append(argv[1]);
-  //demo : Node 1 adds a third log entry. This propagates to Nodes 2 and 3 via hashed CPISync.
-  GossipNode currentNode(strHash);
+    GossipNode* currentNode;
     if (NODE==1)
     {
-        currentNode.init(name, {"key1: val1 | time1", "key2: val2 | time2", "key3: val3 | time3"}, genSync);
-        currentNode.connect(genSync);
+        currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, {"1", "2", "3"});
+        currentNode->sync(HOST, NUM_CHAR, true);
     }
     else
     {
         switch(NODE)
         {
             case(2):
-            currentNode.init(name, {"key1: val1 | time1", "key2: val2 | time2"}, genSync);
+                currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, {"1", "2", "three"});
             break;
             default:
-             currentNode.init(name,{"key1: val1 | time1", "key2: val2 | time2"}, genSync);
-             break;
+                 currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash,{"A", "B", "C"});
+            break;
         }
-
-        currentNode.listen(genSync);
+        currentNode->sync(HOST, NUM_CHAR, false);
     }
+    delete currentNode;
 }
