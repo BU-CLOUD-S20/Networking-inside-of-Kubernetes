@@ -1,6 +1,7 @@
 #ifndef KVSTORE_COMMON_H_
 #define KVSTORE_COMMON_H_
 
+#include <leveldb/db.h>
 #include "../common/base/Base.h"
 
 namespace niok {
