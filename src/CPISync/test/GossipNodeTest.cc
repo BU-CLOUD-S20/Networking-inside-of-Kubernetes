@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <leveldb/db.h>
 #include "../GossipNode.h"
-#include "../../common/base/Base.h"
 
 namespace niok {
 namespace cpisync {

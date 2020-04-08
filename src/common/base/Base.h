@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <typeinfo>       
 #include <thread>
 #include <atomic>
 #include <mutex>

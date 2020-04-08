@@ -3,7 +3,6 @@
 #include <leveldb/db.h>
 #include "../LevelEngine.h"
 #include "../KVEngine.h"
-#include "../../common/base/Base.h"
 #include "../Common.h"
 
 namespace niok {
