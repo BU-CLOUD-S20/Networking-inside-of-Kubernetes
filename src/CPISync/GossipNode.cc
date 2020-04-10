@@ -79,8 +79,6 @@ bool GossipNode::put(std::string key, std::string value)
     string logEntry = keyValueToLog(key, value, "P");
     log_.push_back(logEntry);
     hashDefs[to_string(strHash(logEntry))] = logEntry;
-
-    sync(HOST, NUM_CHAR, true);
     
     return commit(logEntry);
 }
@@ -90,8 +88,6 @@ bool GossipNode::remove(std::string key)
     string logEntry = keyValueToLog(key, "", "R");
     log_.push_back(logEntry);
     hashDefs[to_string(strHash(logEntry))] = logEntry;
-
-    sync(HOST, NUM_CHAR, true);
     
     return commit(logEntry);
 }

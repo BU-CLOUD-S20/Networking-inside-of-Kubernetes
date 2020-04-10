@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
         currentNode->GossipNode::put("3", "22");
         currentNode->GossipNode::put("2", "55");
         currentNode->GossipNode::remove("2");
+        currentNode->GossipNode::sync(HOST, NUM_CHAR, true);
     }
     else
     {
@@ -50,8 +51,6 @@ int main(int argc, char *argv[])
                  currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash,{"A", "B", "C"});
             break;
         }
-        currentNode->sync(HOST, NUM_CHAR, false);
-        currentNode->sync(HOST, NUM_CHAR, false);
         currentNode->sync(HOST, NUM_CHAR, false);
         currentNode->processLogEntry();
 
