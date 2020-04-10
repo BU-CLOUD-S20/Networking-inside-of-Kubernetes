@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
 {
     //==============================================================================================
     //handle incorrect usage
-    cout << "hey" << endl;
     const int NODE = stoi(argv[1]);
     
     if (argc != 2 || NODE<1 || NODE>3)
@@ -35,22 +34,33 @@ int main(int argc, char *argv[])
     GossipNode* currentNode;
     if (NODE==1)
     {
-        currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, {"1","2","3"});
-        currentNode->GossipNode::put("hello", "world");
-        //currentNode->sync(HOST, NUM_CHAR, true);
+        currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, {});
+        currentNode->GossipNode::put("3", "22");
+        currentNode->GossipNode::put("2", "55");
+        currentNode->GossipNode::remove("2");
     }
     else
     {
         switch(NODE)
         {
             case(2):
-                currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, {"1","2","3"});
+                currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, {});
             break;
             default:
                  currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash,{"A", "B", "C"});
             break;
         }
         currentNode->sync(HOST, NUM_CHAR, false);
+        currentNode->sync(HOST, NUM_CHAR, false);
+        currentNode->sync(HOST, NUM_CHAR, false);
+        currentNode->processLogEntry();
+
+        string res;
+        currentNode->GossipNode::get("3", &res);
+        cout << res << endl;
+        currentNode->GossipNode::get("2", &res);
+        cout << res << endl;
+
     }
     delete currentNode;
     

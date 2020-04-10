@@ -18,25 +18,44 @@ GossipNode::GossipNode(string nodeName, int spaceId, string path,
         log_.push_back(initialElems[i]);
         hashDefs[to_string(strHash(initialElems[i]))] = initialElems[i];
     }
-    cout << "All logs of current node:" << endl << endl;
+    //cout << "All logs of current node:" << endl << endl;
     for (int i = 0; i<log_.size(); ++i)
     {
-        cout <<" " + log_.at(i);
+        //cout << " " + log_.at(i);
     }
-    cout <<endl << endl;
+    //cout <<endl << endl;
 }
 
-bool GossipNode::commit(std::string key, std::string value) 
+bool GossipNode::commit(std::string log) 
 {
-    auto resultCode = db_->put(key, value);
-    if (resultCode != kvstore::ResultCode::SUCCEEDED)
+    vector<string> separated = logToKeyValue(log);
+    if (separated[0] == "P") 
     {
-        cout << resultCode << endl;
-        return false;
+        string key = separated[2], value = separated[3];
+        auto resultCode = db_->put(key, value);
+        if (resultCode != kvstore::ResultCode::SUCCEEDED)
+        {
+            cout << "ResultCode: " << resultCode << endl;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
-    else
+    else if (separated[0] == "R")
     {
-        return true;
+        string key = separated[2];
+        auto resultCode = db_->remove(key);
+        if (resultCode != kvstore::ResultCode::SUCCEEDED)
+        {
+            cout << "ResultCode: " << resultCode << endl;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
@@ -45,7 +64,7 @@ bool GossipNode::get(const std::string& key, std::string* value)
     auto resultCode = db_->get(key, value);
     if (resultCode != kvstore::ResultCode::SUCCEEDED)
     {
-        cout << resultCode << endl;
+        cout << "ResultCode: " << resultCode << endl;
         return false;
     }
     else
@@ -62,36 +81,47 @@ bool GossipNode::put(std::string key, std::string value)
     hashDefs[to_string(strHash(logEntry))] = logEntry;
 
     sync(HOST, NUM_CHAR, true);
+    
+    return commit(logEntry);
+}
 
-    return commit(key, value);
+bool GossipNode::remove(std::string key)
+{
+    string logEntry = keyValueToLog(key, "", "R");
+    log_.push_back(logEntry);
+    hashDefs[to_string(strHash(logEntry))] = logEntry;
+
+    sync(HOST, NUM_CHAR, true);
+    
+    return commit(logEntry);
 }
 
 void GossipNode::sync(string host, int NUM_CHAR, bool server)
 {
     string res;
     //sync hashes
-    cout << "New hashed logs recieved:" << endl <<endl;
+    // cout << "New hashed logs recieved:" << endl <<endl;
     if (server)
     {
         res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + getNewHashedLogs());
-        cout<<res <<endl <<endl;
+        // cout<<res <<endl <<endl;
     }
     else
     {
         res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + getNewHashedLogs());
-        cout<<res <<endl <<endl;
+        // cout<<res <<endl <<endl;
     }
     //request hash definition
-    cout << "Hash definitions requested:" <<endl <<endl;
+    //cout << "Hash definitions requested:" <<endl <<endl;
     if (server)
     {
         res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + res);
-        cout<<res <<endl << endl;
+        // cout<<res <<endl << endl;
     }
     else
     {
         res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + res);
-        cout<<res <<endl <<endl;
+        //cout<<res <<endl <<endl;
     }
     //send hash definition
     string defs;
@@ -101,7 +131,7 @@ void GossipNode::sync(string host, int NUM_CHAR, bool server)
         defs+= (" "+hashDefs[tok]);
         tok = strtok (NULL, " ");
     }
-    cout << "New logs from sync:" << endl <<endl;
+    // cout << "New logs from sync:" << endl <<endl;
     if (server)
     {
         res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + defs);
@@ -111,13 +141,6 @@ void GossipNode::sync(string host, int NUM_CHAR, bool server)
         res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + defs);
     }
 
-    vector<string> parsedLogEntry = logToKeyValue(res);
-    if (parsedLogEntry[0] == "P") 
-    {
-        put(parsedLogEntry[2], parsedLogEntry[3]);
-    }
-    
-
     tok = strtok(getCharsFromString(res), " ");
     while (tok!= NULL)
     {
@@ -125,14 +148,20 @@ void GossipNode::sync(string host, int NUM_CHAR, bool server)
         tok = strtok (NULL, " ");
     }
     EOL = log_.size();
-    cout << endl;
+    // cout << endl;
 }
 
 string GossipNode::keyValueToLog(string key, string value, string op) {
     Time t;
-    string res = op + "+" + t.getCurrentTime() + "+" + key + "+" + value;
-    cout << "log is: "; 
-    cout << res << endl;
+    string res;
+    if (op == "P") 
+    {
+        res = op + "+" + t.getCurrentTime() + "+" + key + "+" + value;
+    }
+    else if (op == "R")
+    {
+        res = op + "+" + t.getCurrentTime() + "+" + key;
+    }
     return res;
 }
 
@@ -140,17 +169,30 @@ vector<string> GossipNode::logToKeyValue(string log) {
     vector<string> res;
     istringstream is(log);
     string tmp;
-
     while (getline(is, tmp, '+')) {
         res.push_back(tmp);
     }
+    is.clear();
     return res;
 }
 
+void GossipNode::processLogEntry()
+{
+    int i = EOC;
+    for (i; i < log_.size(); i++) {
+        string logEntry = log_[i];
+        if (!commit(logEntry)) 
+        {
+            cout << "this LogEntry commited failed : ";
+            cout << logEntry << endl;
+        }
+    }
+    EOC = i;
+}
 string GossipNode::getNewHashedLogs()
 {
     string res;
-    for (int  i = log_.size()-1; i> EOL -1; --i)
+    for (int  i = log_.size()-1; i > EOL -1; --i)
     {
         res+= " " + to_string(strHash(log_.at(i)));
     }
