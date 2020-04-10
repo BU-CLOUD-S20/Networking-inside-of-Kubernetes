@@ -5,6 +5,41 @@ namespace niok
 namespace cpisync
 {
 
+GossipNode::GossipNode(string nodeName, int spaceId, string path,
+               hash<string> hashFunc, vector<string> initialElems)
+{
+    name_ = nodeName;
+    rootPath_ = path;
+    db_ = new kvstore::LevelEngine(spaceId, rootPath_);
+    strHash = hashFunc;
+    //fill log and add defs
+    for (int i = 0; i < initialElems.size(); ++i)
+    {
+        log_.push_back(initialElems[i]);
+        hashDefs[to_string(strHash(initialElems[i]))] = initialElems[i];
+    }
+    cout << "All logs of current node:" << endl << endl;
+    for (int i = 0; i<log_.size(); ++i)
+    {
+        cout <<" " + log_.at(i);
+    }
+    cout <<endl << endl;
+}
+
+bool GossipNode::commit(std::string key, std::string value) 
+{
+    auto resultCode = db_->put(key, value);
+    if (resultCode != kvstore::ResultCode::SUCCEEDED)
+    {
+        cout << resultCode << endl;
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
 bool GossipNode::get(const std::string& key, std::string* value)
 {
     auto resultCode = db_->get(key, value);
@@ -21,16 +56,14 @@ bool GossipNode::get(const std::string& key, std::string* value)
 
 bool GossipNode::put(std::string key, std::string value)
 {
-    auto resultCode = db_->put(key, value);
-    if (resultCode != kvstore::ResultCode::SUCCEEDED)
-    {
-        cout << resultCode << endl;
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+    //fill log and add defs
+    string logEntry = keyValueToLog(key, value, "P");
+    log_.push_back(logEntry);
+    hashDefs[to_string(strHash(logEntry))] = logEntry;
+
+    sync(HOST, NUM_CHAR, true);
+
+    return commit(key, value);
 }
 
 void GossipNode::sync(string host, int NUM_CHAR, bool server)
@@ -68,17 +101,23 @@ void GossipNode::sync(string host, int NUM_CHAR, bool server)
         defs+= (" "+hashDefs[tok]);
         tok = strtok (NULL, " ");
     }
-         cout << "New logs from sync:" << endl <<endl;
-     if (server)
+    cout << "New logs from sync:" << endl <<endl;
+    if (server)
     {
         res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + defs);
-        cout<<res <<endl;
     }
     else
     {
         res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + defs);
-        cout<<res <<endl;
     }
+
+    vector<string> parsedLogEntry = logToKeyValue(res);
+    if (parsedLogEntry[0] == "P") 
+    {
+        put(parsedLogEntry[2], parsedLogEntry[3]);
+    }
+    
+
     tok = strtok(getCharsFromString(res), " ");
     while (tok!= NULL)
     {
@@ -88,6 +127,26 @@ void GossipNode::sync(string host, int NUM_CHAR, bool server)
     EOL = log_.size();
     cout << endl;
 }
+
+string GossipNode::keyValueToLog(string key, string value, string op) {
+    Time t;
+    string res = op + "+" + t.getCurrentTime() + "+" + key + "+" + value;
+    cout << "log is: "; 
+    cout << res << endl;
+    return res;
+}
+
+vector<string> GossipNode::logToKeyValue(string log) {
+    vector<string> res;
+    istringstream is(log);
+    string tmp;
+
+    while (getline(is, tmp, '+')) {
+        res.push_back(tmp);
+    }
+    return res;
+}
+
 string GossipNode::getNewHashedLogs()
 {
     string res;

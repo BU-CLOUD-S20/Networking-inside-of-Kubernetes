@@ -3,13 +3,16 @@
 *   Zhe Deng Networking Inside of Kubernetes EC528 Spring 2020
 */
 
+#ifndef KVSTORE_GOSSIPNODE_H_
+#define KVSTORE_GOSSIPNODE_H_
+
 #pragma once
 #include <CPISync/Syncs/GenSync.h>
 #include <CPISync/Data/DataObject.h>
 #include "../kvstore/KVEngine.h"
 #include "../kvstore/LevelEngine.h"
+#include "../common/base/Base.h"
 
-using namespace leveldb;
 using std::cout;
 using std::endl;
 using std::string;
@@ -27,31 +30,19 @@ public:
     string name_;
     //Constructor
     GossipNode(string nodeName, int spaceId, string path,
-               hash<string> hashFunc, vector<string> initialElems)
-    {
-        name_ = nodeName;
-        rootPath_ = path;
-        //  db_ = new kvstore::LevelEngine(spaceId, rootPath_);
-        strHash = hashFunc;
-        //fill log and add defs
-        for (int i = 0; i < initialElems.size(); ++i)
-        {
-            log_.push_back(initialElems[i]);
-            hashDefs[to_string(strHash(initialElems[i]))] = initialElems[i];
-        }
-        cout << "All logs of current node:" << endl << endl;
-        for (int i = 0; i<log_.size(); ++i)
-        {
-            cout <<" " + log_.at(i);
-        }
-        cout <<endl << endl;
-    }
+               hash<string> hashFunc, vector<string> initialElems);
     //delete db to prevent memory leaks as well as to pass leveldb status.ok()
     ~GossipNode()
     {
         delete db_;
     }
     void sync(string HOST, int NUM_CHAR, bool server);
+
+    vector<string> logToKeyValue(string log);
+
+    string keyValueToLog(string key, string value, string op);
+
+    bool commit(std::string key, std::string value);
 
     bool get(const std::string& key, std::string* value);
 
@@ -104,7 +95,11 @@ private:
     //KV
     kvstore::LevelEngine* db_;
     string rootPath_;
+
+    const string HOST = "172.28.1.1";
+    const int NUM_CHAR = 64;
 };
 
 } //namespace cpisync
 } //namespace niok
+#endif

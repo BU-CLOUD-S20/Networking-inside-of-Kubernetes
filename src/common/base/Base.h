@@ -41,5 +41,7 @@
 #include <cassert>
 #include <cmath>
 
+#include "../utils/IPv4.h"
+#include "../utils/Time.h"
 
 #endif
