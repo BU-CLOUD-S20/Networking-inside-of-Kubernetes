@@ -42,11 +42,15 @@ public:
 
     string keyValueToLog(string key, string value, string op);
 
-    bool commit(std::string key, std::string value);
+    bool commit(std::string log);
 
     bool get(const std::string& key, std::string* value);
 
     bool put(std::string key, std::string value);
+
+    bool remove(std::string key);
+
+    void processLogEntry();
     //HELPER FUNCTIONS
     //gets any new logs added (index>=EOL) separated with spaces, use with exec
     string getNewHashedLogs();
@@ -89,6 +93,7 @@ private:
     vector <string> log_;
     vector <string> neighbors_;
     int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
+    int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync
     hash<string> strHash;
     map <string, string> hashDefs;
