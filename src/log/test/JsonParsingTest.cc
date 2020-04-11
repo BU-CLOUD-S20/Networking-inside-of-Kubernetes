@@ -1,25 +1,25 @@
 #include "../../common/base/Base.h"
 #include <gtest/gtest.h>
-#include "../JsonParsing.cc"
+#include "../JsonParsing.h"
 
 namespace niok {
 namespace log {
 
 TEST(JsonParsingTest, SimpleTest) {
-    std::string logFile = "exampleLog.json";
+    JsonParsing *jp = new JsonParsing("exampleLog.json");
 
     // add 5 keys and values to the log
     for (int i = 0; i < 5; i++) {
         std::string key = "Timestamp" + std::to_string(i);
         std::string value = "Value" + std::to_string(i);
-        log::addLogToFile(logFile, key, value);
+        jp->JsonParsing::addLogToFile(key, value);
     }
-
-    EXPECT_EQ(log::getValueFromKey(logFile, "Timestamp0"), "Value0");
-    EXPECT_EQ(log::getValueFromKey(logFile, "Timestamp1"), "Value1");
-    EXPECT_EQ(log::getValueFromKey(logFile, "Timestamp2"), "Value2");
-    EXPECT_EQ(log::getValueFromKey(logFile, "Timestamp3"), "Value3");
-    EXPECT_EQ(log::getValueFromKey(logFile, "Timestamp4"), "Value4");
+    std::cout << jp->JsonParsing::getValueFromKey("Timestamp0") << std::endl;
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp0"), "Value0");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp1"), "Value1");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp2"), "Value2");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp3"), "Value3");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp4"), "Value4");
 }
 
 }  // namespace kvstore
