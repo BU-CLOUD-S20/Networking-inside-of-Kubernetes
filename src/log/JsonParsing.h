@@ -22,6 +22,8 @@ public:
 
     void addLogToFile(std::string key, std::string value);
 
+    void addLogToFileTimestamp(std::string value);
+
     void printFileContents();
 
     json createNewJson(std::string key, std::string val);
