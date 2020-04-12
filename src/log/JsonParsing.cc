@@ -49,6 +49,7 @@ void JsonParsing::addLogToFile(string key, string value) {
 }
 
 // adds a new log with current time as key and a given value
+// Format: "Day Hour:Minute:Second:Millisecond"
 void JsonParsing::addLogToFileTimestamp(string value) {
 
     // read in the file
@@ -80,7 +81,7 @@ void JsonParsing::addLogToFileTimestamp(string value) {
     oss << std::put_time(&bt, "%H:%M:%S"); // HH:MM:SS
     oss << '.' << std::setfill('0') << std::setw(3) << ms.count();
 
-    string timestamp = ss.str().substr(0, 11);
+    string timestamp = ss.str().substr(8, 3);
     timestamp += oss.str();
 
     // associate timestamp with given value
