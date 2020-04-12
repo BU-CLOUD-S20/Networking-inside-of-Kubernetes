@@ -1,12 +1,16 @@
-#include "../common/base/Base.h"
-#include "json.hpp"
 #include "JsonParsing.cc"
 
-using std::string;
-using namespace niok;
-//namespace niok{
+namespace niok {
+namespace log {
 
 int main() {
+
+  JsonParsing *jp = new JsonParsing("exampleLog2.json");
+  std::string value = "VALUE1";
+  jp -> JsonParsing::addLogToFileTimestamp(value);
+
+  return 0;
+  /*
   // name of the logging file
   string logFile = "exampleLog.json";
 
@@ -27,5 +31,10 @@ int main() {
   std::cout << "printing value from key 4 " << log::getValueFromKey(logFile, "Timestamp4") << std::endl;
 
   return 0;
+  
+  */
+
 }
-//}
+
+}
+}
