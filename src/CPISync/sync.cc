@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     const int EXP_ELTS = 4; // expected number of elements per set
     const int METHOD = 0; // index of method to sync
     //user parameters
-    const int NUM_CHAR = stoi(argv[3]); //max number chars in each objecy (20 for 64 bit hash)
+    const int NUM_CHAR = stoi(argv[3]); //max number chars in each object (20 for 64 bit hash)
     const string HOST = argv[1]; //host ip (use "172.28.1.1 for docker testing)
     GenSync genSync = GenSync::Builder().
                       setProtocol(GenSync::SyncProtocol::InteractiveCPISync).
