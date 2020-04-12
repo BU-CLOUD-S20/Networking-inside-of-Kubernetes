@@ -1,5 +1,5 @@
-#ifndef KVSTORE_ROCKSENGINE_H_
-#define KVSTORE_ROCKSENGINE_H_
+#ifndef KVSTORE_LEVELENGINE_H_
+#define KVSTORE_LEVELENGINE_H_
 
 #include <leveldb/db.h>
 #include "../common/base/Base.h"

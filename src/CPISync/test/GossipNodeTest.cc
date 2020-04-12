@@ -2,11 +2,11 @@
 #include <gtest/gtest.h>
 #include <leveldb/db.h>
 #include "../GossipNode.h"
-#include "../../common/base/Base.h"
 
 namespace niok {
 namespace cpisync {
 
+/*
 TEST(GossipNodeTest, SimpleTest) {
     std::string rootPath = "/tmp/GossipNodeTest.XXXXXX";
     auto node = new cpisync::GossipNode("test", 0, rootPath);
@@ -15,7 +15,7 @@ TEST(GossipNodeTest, SimpleTest) {
     EXPECT_EQ(true, node->get("key", &val));
     EXPECT_EQ("val", val);
 }
-
+*/
 }  // namespace cpisync
 }  // namespace niok
 

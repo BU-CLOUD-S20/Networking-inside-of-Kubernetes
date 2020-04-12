@@ -1,0 +1,6 @@
+niok_add_library(
+    log_obj OBJECT
+    JsonParsing.cc
+)
+
+niok_add_subdirectory(test)

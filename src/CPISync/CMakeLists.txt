@@ -1,7 +1,6 @@
 niok_add_library(
     cpisync_obj OBJECT
     GossipNode.cc
-    GossipUtilities.cc
     ../kvstore/LevelEngine.cc
 )
 
