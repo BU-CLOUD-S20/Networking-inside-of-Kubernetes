@@ -15,11 +15,11 @@ TEST(JsonParsingTest, SimpleTest) {
         timestamps[i] = jp->JsonParsing::addLogToFileTimestamp(value);
     }
 
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[0].substr(2, timestamps.size()-4)), "Value0");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[1].substr(2, timestamps.size()-4)), "Value1");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[2].substr(2, timestamps.size()-4)), "Value2");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[3].substr(2, timestamps.size()-4)), "Value3");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[4].substr(2, timestamps.size()-4)), "Value4");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[0].substr(2, timestamps[0].size()-4)), "Value0");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[1].substr(2, timestamps[1].size()-4)), "Value1");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[2].substr(2, timestamps[2].size()-4)), "Value2");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[3].substr(2, timestamps[3].size()-4)), "Value3");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[4].substr(2, timestamps[4].size()-4)), "Value4");
 }
 
 }  // namespace kvstore
