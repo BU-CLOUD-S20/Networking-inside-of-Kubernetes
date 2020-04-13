@@ -64,28 +64,15 @@ void JsonParsing::addLogToFileTimestamp(string value) {
       j = json::parse(buffer.str());
     }
 
-    // get current time for timestamp
-    auto now = std::chrono::system_clock::now();
-    auto in_time_t = std::chrono::system_clock::to_time_t(now);
-
+    // calculate timestamp
+    // time since midnight, Janurary 1, 1970 UTC in milliseconds
+    unsigned long long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>
+    (std::chrono::system_clock::now().time_since_epoch()).count();
+    
     std::stringstream ss;
-    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
-
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-
-    auto timer = std::chrono::system_clock::to_time_t(now);
-
-    std::tm bt = *std::localtime(&timer);
-
-    std::ostringstream oss;
-    oss << std::put_time(&bt, "%H:%M:%S"); // HH:MM:SS
-    oss << '.' << std::setfill('0') << std::setw(3) << ms.count();
-
-    string timestamp = ss.str().substr(8, 3);
-    timestamp += oss.str();
-
+    ss << timestamp;
     // associate timestamp with given value
-    j[timestamp] = { value };
+    j[ss.str()] = { value };
 
     // output the appended json object to the file
     std::ofstream log;
