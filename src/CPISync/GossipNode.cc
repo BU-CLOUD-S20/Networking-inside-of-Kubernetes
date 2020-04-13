@@ -92,6 +92,11 @@ bool GossipNode::remove(std::string key)
     return commit(logEntry);
 }
 
+void addNeighbor(IPv4 *ip) 
+{
+    neighbors_.insert(ip);
+}
+
 void GossipNode::sync(string host, int NUM_CHAR, bool server)
 {
     string res;

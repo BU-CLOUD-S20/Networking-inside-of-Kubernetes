@@ -11,5 +11,13 @@ public:
         ip_ = ip;
         port_ = port;
     }
+
+    std::string getIP() {
+        return ip_;
+    }
+
+    int getPort() {
+        return port_;
+    }
 };
 #endif
