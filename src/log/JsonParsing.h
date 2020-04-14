@@ -22,7 +22,9 @@ public:
 
     void addLogToFile(std::string key, std::string value);
 
-    void addLogToFileTimestamp(std::string value);
+    std::string addLogToFileTimestamp(std::string value);
+
+    std::string getTimestamp();
 
     void printFileContents();
 
