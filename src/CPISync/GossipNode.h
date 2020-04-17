@@ -50,6 +50,8 @@ public:
 
     bool remove(std::string key);
 
+    void addNeighbor(IPv4 *ip);
+
     void processLogEntry();
     //HELPER FUNCTIONS
     //gets any new logs added (index>=EOL) separated with spaces, use with exec
@@ -91,7 +93,7 @@ public:
 private:
     //log
     vector <string> log_;
-    vector <string> neighbors_;
+    unordered_set<IPv4*> neighbors_;
     int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
     int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync

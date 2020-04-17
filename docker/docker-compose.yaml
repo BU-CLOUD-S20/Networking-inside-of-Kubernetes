@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   node1:
-    image: freddiefy/ec528networking-dev:v2
+    image: freddiefy/ec528networking-dev:v3
     container_name: node1
     hostname: node1
     privileged: true
@@ -21,7 +21,7 @@ services:
     entrypoint: /bin/bash
 
   node2:
-    image: freddiefy/ec528networking-dev:v2
+    image: freddiefy/ec528networking-dev:v3
     container_name: node2
     hostname: node2
     privileged: true
@@ -40,7 +40,7 @@ services:
     entrypoint: /bin/bash
   
   node3:
-    image: freddiefy/ec528networking-dev:v2
+    image: freddiefy/ec528networking-dev:v3
     container_name: node3
     hostname: node3
     privileged: true
