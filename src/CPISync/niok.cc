@@ -19,7 +19,7 @@ GossipNode* currentNode;
 
 const string HOST = "172.28.1.1";
 const int NUM_CHAR_HASH = 20; //default 20
-const int NUM_CHAR_ENTRY = 512;
+const int NUM_CHAR_ENTRY = 256;
 hash<string> strHash;
 
 int main(int argc, char *argv[])
@@ -42,68 +42,61 @@ int main(int argc, char *argv[])
         initialElems.push_back(argv[i]);
     }
     currentNode = new GossipNode(name, 0, "/tmp/"+name,
-                                 strHash, NUM_CHAR_HASH, NUM_CHAR_HASH, initialElems);
+                                 strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, initialElems);
+
+    //use ./niok 1 or ./niok 2
+    bool server;
     if (NODE == 1)
-    {
-        while (true)
-        {
-            //get input
-            char input[256];
-            try
-            {
-            cin.getline(input, 256, '\n');
-            }
-            catch(...)
-            {
-            cerr << "Error: Please input a command" << endl;
-            }
-            //parse input
-            vector<string> inputVec;
-            char* tok = strtok(input, " ");
-            while (tok!= NULL)
-            {
-                inputVec.push_back(tok);
-                tok = strtok (NULL, " ");
-            }
-            //execute operation
-            if (inputVec[0].compare("put")==0)
-            {
-                currentNode->put(inputVec[1], inputVec[2]);
-            }
-            else if (inputVec[0].compare("get")==0)
-            {
-                string res;
-                currentNode->get(inputVec[1], &res);
-                cout << res << endl;
-            }
-            else if (inputVec[0].compare("del")==0)
-            {
-                currentNode->remove(inputVec[1]);
-            }
-            else
-            {
-                cout << "Please use one of the following commands:" << endl;
-                cout << "1. put [key] [value]" <<endl;
-                cout << "2. get [key]" <<endl;
-                cout << "3. del [key]" <<endl;
-            }
-            //process
-            currentNode->processLogEntry();
-            //sync
-            currentNode->sync(HOST, true);
-        }
-    }
+        server = true;
     else
+        server = false;
+    while (true)
     {
-        //listen on main thread
-        while(true)
+        //get input
+        cout << name << ": ";
+        char input[256];
+        cin.getline(input, 256, '\n');
+
+        //parse input
+        vector<string> inputVec;
+        char* tok = strtok(input, " ");
+        while (tok!= NULL)
         {
-            currentNode->sync(HOST, false);
-            currentNode->processLogEntry();
+            inputVec.push_back(tok);
+            tok = strtok (NULL, " ");
+        }
+
+        //execute operation
+        if (inputVec[0].compare("put")==0)
+        {
+            currentNode->put(inputVec[1], inputVec[2]);
+        }
+        else if (inputVec[0].compare("get")==0)
+        {
             string res;
-            currentNode->get("2", &res);
+            currentNode->get(inputVec[1], &res);
             cout << res << endl;
         }
+        else if (inputVec[0].compare("del")==0)
+        {
+            currentNode->remove(inputVec[1]);
+        }
+        else if (inputVec[0].compare("sync")==0)
+        {
+        }
+        else
+        {
+            cout << "Please use one of the following commands:" << endl;
+            cout << "1. put [key] [value]" <<endl;
+            cout << "2. get [key]" <<endl;
+            cout << "3. del [key]" <<endl;
+        }
+        //process
+        currentNode->processLogEntry();
+        //sync
+        currentNode->sync(HOST, server);
+        //process after sync
+        currentNode->processLogEntry();
     }
     //delete
     delete currentNode;

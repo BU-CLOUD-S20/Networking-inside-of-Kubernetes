@@ -18,6 +18,7 @@ GossipNode::GossipNode(string nodeName, int spaceId, string path, //db
         log_.push_back(initialEntries[i]);
         hashDefs[to_string(strHash(initialEntries[i]))] = initialEntries[i];
     }
+    processLogEntry();
 }
 
 bool GossipNode::commit(std::string log)
@@ -170,5 +171,12 @@ void GossipNode::processLogEntry()
     }
     EOC = logSize;
 }
+
+void GossipNode::addNeighbor(IPv4 *ip)
+{
+
+    neighbors_.insert(ip);
+}
 } // cpisync
 } // namespace niok
+

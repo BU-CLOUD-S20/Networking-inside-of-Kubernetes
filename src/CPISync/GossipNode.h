@@ -1,5 +1,6 @@
 /*
 *   Node class, where each node has a leveldb store and can communicate through CPISync.
+*   See niok.cc for example of usage.
 *   Zhe Deng Networking Inside of Kubernetes EC528 Spring 2020
 */
 
@@ -34,22 +35,21 @@ public:
     {
         delete db_;
     }
-    void sync(string host, bool server, int times = 1);
 
-    vector<string> logToKeyValue(string log);
-
-    string keyValueToLog(string key, string value, string op);
-
-    bool commit(std::string log);
-
+    //====Operations=====================
     bool get(const std::string& key, std::string* value);
-
     bool put(std::string key, std::string value);
-
     bool remove(std::string key);
-
+    void addNeighbor(IPv4 *ip);
+    //====Commit Operations==============
     void processLogEntry();
-
+    //=====Sync Logs=====================
+    void sync(string host, bool server, int times = 1);
+    //=======Helper Functions============
+    vector<string> logToKeyValue(string log);
+    string keyValueToLog(string key, string value, string op);
+    //used in processLogEntry()
+    bool commit(std::string log);
     //modified version of: https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
     string exec(string strCmd)
     {
@@ -82,7 +82,7 @@ private:
     const string name_;
     //log
     vector <string> log_; //vector of log entries
-    vector <string> neighbors_;
+    unordered_set<IPv4*> neighbors_;
     int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
     int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync
