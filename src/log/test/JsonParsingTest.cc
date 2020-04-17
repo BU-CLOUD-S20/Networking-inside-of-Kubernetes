@@ -7,19 +7,19 @@ namespace log {
 
 TEST(JsonParsingTest, SimpleTest) {
     JsonParsing *jp = new JsonParsing("exampleLog.json");
+    std::string timestamps [5]; 
 
-    // add 5 keys and values to the log
+    // add 5 timestamped values to the log
     for (int i = 0; i < 5; i++) {
-        std::string key = "Timestamp" + std::to_string(i);
         std::string value = "Value" + std::to_string(i);
-        jp->JsonParsing::addLogToFile(key, value);
+        timestamps[i] = jp->JsonParsing::addLogToFileTimestamp(value);
     }
-    std::cout << jp->JsonParsing::getValueFromKey("Timestamp0") << std::endl;
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp0"), "Value0");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp1"), "Value1");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp2"), "Value2");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp3"), "Value3");
-    EXPECT_EQ(jp->JsonParsing::getValueFromKey("Timestamp4"), "Value4");
+
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[0]), "Value0");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[1]), "Value1");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[2]), "Value2");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[3]), "Value3");
+    EXPECT_EQ(jp->JsonParsing::getValueFromKey(timestamps[4]), "Value4");
 }
 
 }  // namespace kvstore
