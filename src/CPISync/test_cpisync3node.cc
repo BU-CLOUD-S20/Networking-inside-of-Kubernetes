@@ -35,11 +35,9 @@ int main(int argc, char *argv[])
     }
     //==============================================================================================
     //sync current server-client pair
-    string name = "node";
-    name.append(argv[1]);
     if (NODE==1)
     {
-        currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, {});
+        currentNode = new GossipNode(argv[1], 0, "/tmp/GossipNodeTest.XXXXXX", strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, {});
         currentNode->GossipNode::put("3", "22");
         currentNode->GossipNode::put("2", "55");
         currentNode->GossipNode::sync(HOST, true);
@@ -49,10 +47,10 @@ int main(int argc, char *argv[])
         switch(NODE)
         {
         case(2):
-            currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, {});
+            currentNode = new GossipNode(argv[1], 0, "/tmp/GossipNodeTest.XXXXXX", strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, {});
             break;
         default:
-            currentNode = new GossipNode(name, 0, "/tmp/GossipNodeTest.XXXXXX", strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, {"A", "B", "C"});
+            currentNode = new GossipNode(argv[1], 0, "/tmp/GossipNodeTest.XXXXXX", strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, {"A", "B", "C"});
             break;
         }
         currentNode->sync(HOST, false);
@@ -62,10 +60,8 @@ int main(int argc, char *argv[])
         cout << res << endl;
         currentNode->get("2", &res);
         cout << res << endl;
-
     }
     delete currentNode;
-
 }
 
 

@@ -11,7 +11,6 @@
 #include "../kvstore/KVEngine.h"
 #include "../kvstore/LevelEngine.h"
 #include "../common/base/Base.h"
-#include <cstring>
 
 using std::cout;
 using std::endl;
@@ -35,7 +34,7 @@ public:
     {
         delete db_;
     }
-    void sync(string host, bool server);
+    void sync(string host, bool server, int times = 1);
 
     vector<string> logToKeyValue(string log);
 
@@ -54,7 +53,7 @@ public:
     //modified version of: https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
     string exec(string strCmd)
     {
-        char* cmd= getCharsFromString(strCmd, '\n');
+        char* cmd= getCharsFromString(strCmd);
         std::array<char, 128> buffer;
         std::string result;
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
@@ -70,11 +69,11 @@ public:
         return result;
     }
     //convert a string 'str' to char* and append with 'append'
-    char* getCharsFromString(string str, char append)
+    char* getCharsFromString(string str)
     {
         char* res=new char[str.length()+1];
         str.copy(res, str.size());
-        res[str.length()] = append; //end string with delimiter or null
+        res[str.length()] = '\0'; //end string with null
         return res;
     }
 

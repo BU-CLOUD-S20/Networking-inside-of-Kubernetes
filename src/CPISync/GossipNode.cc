@@ -73,7 +73,7 @@ bool GossipNode::put(std::string key, std::string value)
     string logEntry = keyValueToLog(key, value, "P");
     log_.push_back(logEntry);
     hashDefs[to_string(strHash(logEntry))] = logEntry;
-    return commit(logEntry);
+    return true;
 }
 
 bool GossipNode::remove(std::string key)
@@ -81,15 +81,14 @@ bool GossipNode::remove(std::string key)
     string logEntry = keyValueToLog(key, "", "R");
     log_.push_back(logEntry);
     hashDefs[to_string(strHash(logEntry))] = logEntry;
-
-    return commit(logEntry);
+    return true;
 }
 
-void GossipNode::sync(string host, bool server)
+void GossipNode::sync(string host, bool server, int times)
 {
     int logSize = log_.size();
     string hashes;
-    for (int  i = logSize-1; i > EOL -1; --i)
+    for (int  i = EOL; i <logSize; ++i)
     {
         hashes+= " " + to_string(strHash(log_.at(i)));
     }
@@ -99,7 +98,7 @@ void GossipNode::sync(string host, bool server)
     hashes = exec(cmd + to_string(NUM_CHAR_HASH) + hashes);
     //save vector of unknownHashes for later
     vector<string> unknownHashes;
-    char* tok = strtok(getCharsFromString(hashes,' '), " ");
+    char* tok = strtok(getCharsFromString(hashes), " ");
     while (tok!= NULL)
     {
         unknownHashes.push_back(tok);
@@ -109,7 +108,7 @@ void GossipNode::sync(string host, bool server)
     hashes = exec(cmd + to_string(NUM_CHAR_HASH) + hashes);
     //send definitions
     string defs;
-    tok = strtok(getCharsFromString(hashes,' '), " ");
+    tok = strtok(getCharsFromString(hashes), " ");
     while (tok!= NULL)
     {
         defs+= (" "+hashDefs[tok]);
@@ -117,11 +116,11 @@ void GossipNode::sync(string host, bool server)
     }
     defs = exec(cmd + to_string(NUM_CHAR_ENTRY) + defs);
     //update hashDefs and log_
-    tok = strtok(getCharsFromString(defs, ' '), " ");
+    tok = strtok(getCharsFromString(defs), " ");
     int i = 0;
     while (tok!= NULL)
     {
-        //hashDefs[unknownHashes.at(i)] = tok;
+        hashDefs[unknownHashes.at(i)] = tok;
         log_.push_back(tok);
         tok = strtok (NULL, " ");
         ++i;
@@ -160,15 +159,13 @@ vector<string> GossipNode::logToKeyValue(string log)
 
 void GossipNode::processLogEntry()
 {
-    int i = EOC;
     const int logSize = log_.size();
-    for (i; i < logSize; ++i)
+    for (int i=EOC; i < logSize; ++i)
     {
-        string logEntry = log_[i];
-        if (!commit(logEntry))
+        if (!commit(log_[i]))
         {
             cout << "this LogEntry commited failed : ";
-            cout << logEntry << endl;
+            cout << log_[i] << endl;
         }
     }
     EOC = logSize;

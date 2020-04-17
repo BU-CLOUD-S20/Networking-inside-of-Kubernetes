@@ -22,36 +22,9 @@ const int NUM_CHAR_HASH = 20; //default 20
 const int NUM_CHAR_ENTRY = 512;
 hash<string> strHash;
 
-void getInput()
-{
-    string input;
-    while (true)
-    {
-        char input[256];
-        cin.getline(input, 256, '\n');
-        vector<string> inputVec;
-        char* tok = strtok(input, " ");
-        while (tok!= NULL)
-        {
-            inputVec.push_back(tok);
-            tok = strtok (NULL, " ");
-        }
-        if (inputVec[0].compare("put")==0)
-        {
-            currentNode->put("2", "3");
-        }
-        else if (inputVec[0].compare("get")==0)
-        {
-            string res;
-            currentNode->get(inputVec[1], &res);
-            cout << res << endl;
-        }
-        currentNode->sync(HOST, true);
-    }
-}
-
 int main(int argc, char *argv[])
 {
+    const int NODE = stoi(argv[1]);
     //==============================================================================================
     //handle incorrect usage
     if (argc < 2)
@@ -70,29 +43,68 @@ int main(int argc, char *argv[])
     }
     currentNode = new GossipNode(name, 0, "/tmp/"+name,
                                  strHash, NUM_CHAR_HASH, NUM_CHAR_HASH, initialElems);
-    //get input asynchronously
-    thread inputThread(getInput);
-    //listen on main thread
-    while(true)
+    if (NODE == 1)
     {
-        currentNode->sync(HOST, false);
-        currentNode->processLogEntry();
-        string res;
-        currentNode->get("2", &res);
-        cout << res << endl;
+        while (true)
+        {
+            //get input
+            char input[256];
+            try
+            {
+            cin.getline(input, 256, '\n');
+            }
+            catch(...)
+            {
+            cerr << "Error: Please input a command" << endl;
+            }
+            //parse input
+            vector<string> inputVec;
+            char* tok = strtok(input, " ");
+            while (tok!= NULL)
+            {
+                inputVec.push_back(tok);
+                tok = strtok (NULL, " ");
+            }
+            //execute operation
+            if (inputVec[0].compare("put")==0)
+            {
+                currentNode->put(inputVec[1], inputVec[2]);
+            }
+            else if (inputVec[0].compare("get")==0)
+            {
+                string res;
+                currentNode->get(inputVec[1], &res);
+                cout << res << endl;
+            }
+            else if (inputVec[0].compare("del")==0)
+            {
+                currentNode->remove(inputVec[1]);
+            }
+            else
+            {
+                cout << "Please use one of the following commands:" << endl;
+                cout << "1. put [key] [value]" <<endl;
+                cout << "2. get [key]" <<endl;
+                cout << "3. del [key]" <<endl;
+            }
+            //process
+            currentNode->processLogEntry();
+            //sync
+            currentNode->sync(HOST, true);
+        }
+    }
+    else
+    {
+        //listen on main thread
+        while(true)
+        {
+            currentNode->sync(HOST, false);
+            currentNode->processLogEntry();
+            string res;
+            currentNode->get("2", &res);
+            cout << res << endl;
+        }
     }
     //delete
     delete currentNode;
 }
-
-
-
-
-
-
-
-
-
-
-
-
