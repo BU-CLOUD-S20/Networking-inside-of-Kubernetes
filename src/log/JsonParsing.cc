@@ -4,9 +4,7 @@ using json = nlohmann::json;
 using std::string;
 namespace niok {
 namespace log {
-/*
-    Still need to implement accurate timestamping for keys
-*/
+
 JsonParsing::JsonParsing(string name) {
     name_ = name;
 }
@@ -48,6 +46,55 @@ void JsonParsing::addLogToFile(string key, string value) {
     log.open(name_);
     log << j;
     log.close();
+}
+
+// adds a new log with current time as key and a given value
+// Format: "Day Hour:Minute:Second:Millisecond"
+// returns the assigned timestamp
+std::string JsonParsing::addLogToFileTimestamp(string value) {
+
+    // read in the file
+    std::ifstream test(name_);
+    std::stringstream buffer;
+    buffer << test.rdbuf();
+
+    // make a json object out of the file contents
+    // and append a new key and value
+    json j;
+    if (!buffer.str().empty()) {
+      j = json::parse(buffer.str());
+    }
+
+    // calculate timestamp
+    // time since midnight, Janurary 1, 1970 UTC in milliseconds
+    unsigned long long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>
+    (std::chrono::system_clock::now().time_since_epoch()).count();
+    
+    std::stringstream ss;
+    ss << timestamp;
+    // associate timestamp with given value
+    j[ss.str()] = { value };
+
+    // output the appended json object to the file
+    std::ofstream log;
+    log.open(name_);
+    log << j;
+    log.close();
+
+    return ss.str();
+}
+
+// returns the current timestamp
+std::string JsonParsing::getTimestamp() {
+    // calculate timestamp
+    // time since midnight, Janurary 1, 1970 UTC in milliseconds
+    unsigned long long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>
+    (std::chrono::system_clock::now().time_since_epoch()).count();
+    
+    std::stringstream ss;
+    ss << timestamp;
+    // associate timestamp with given value
+    return ss.str();
 }
 
 // prints the contents of a file 
