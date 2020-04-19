@@ -1,7 +1,7 @@
 #ifndef COMMON_UTILS_TCPCLIENT_H
 #define COMMON_UTILS_TCPCLIENT_H_
 
-#include "../base/Base.h"
+#include "../../base/Base.h"
 #include <tacopie/tacopie>
 
 class TCPClient 
@@ -23,7 +23,18 @@ public:
         for (auto ip : ips_) {
             std::string addr = ip->getIP();
             int port = ip->getPort();
-            client_.connect(addr, port);
+            std::cout << "...connecting " << addr << ":" << port << std::endl; 
+            try
+            {
+                client_.connect(addr, port);
+                client_.disconnect();
+            }
+            catch(const std::exception& e)
+            {
+                std::cout << "###TCP Client error: " << e.what() << std::endl;
+            }
+            
+            
         }
     }
 };

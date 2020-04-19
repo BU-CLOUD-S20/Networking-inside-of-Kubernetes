@@ -18,6 +18,7 @@ using std::thread;
 
 GossipNode* currentNode;
 
+bool server;
 const int TCP_PORT = 8002;
 const int NUM_CHAR_HASH = 20; //default 20
 const int NUM_CHAR_ENTRY = 256;
@@ -25,14 +26,21 @@ hash<string> strHash;
 
 void listenTCP(string ip, int port)
 {
+    IPv4 *IP = new IPv4(ip, port);
+    TCPServer *server = new TCPServer(IP);
+    std::string res;
     while (true)
-    {
-        IPv4 *IP = new IPv4(ip, port);
-        TCPServer *server = new TCPServer(IP);
-        std::string res;
+    {   
         server->start(res); 
         currentNode->addNeighbor(res);
+        server->stop();
+        //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+}
+
+void cli() 
+{
+    
 }
 
 int main(int argc, char *argv[])
@@ -56,15 +64,16 @@ int main(int argc, char *argv[])
     currentNode = new GossipNode(strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, initialElems);
 
     //use ./niok 1 or ./niok 2
-    bool server;
     if (NODE == 1)
         server = true;
     else
         server = false;
     
     // TCP thread
-    std::thread TCP_thread(listenTCP, currentNode->ip_, TCP_PORT);
-    TCP_thread.detach();
+    std::thread tcp_thread(listenTCP, currentNode->ip_, TCP_PORT);
+    //std::thread main_thread(cli);
+    //main_thread.join();
+    
 
     while (true)
     {
@@ -110,12 +119,18 @@ int main(int argc, char *argv[])
         }
         else if (inputVec[0].compare("join")==0)
         {
+            cout << "start joining..." << endl;
             vector<string> ips;
             for (int i = 1; i < inputVec.size(); i++) 
             {
                 ips.push_back(inputVec[i]);
             }
             currentNode->joinCluster(ips);
+        }
+        else if (inputVec[0].compare("exit")==0)
+        {
+            delete currentNode;
+            exit(0);
         }
         else
         {
@@ -124,6 +139,7 @@ int main(int argc, char *argv[])
             cout << "2. get [key]" <<endl;
             cout << "3. del [key]" <<endl;
             cout << "4. show (show neighbors of current node)" << endl;
+            
         }
 
         if (doLogs) 
@@ -135,8 +151,10 @@ int main(int argc, char *argv[])
             //process after sync
             currentNode->processLogEntry();
         }
-        
+        //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+    tcp_thread.join();
+
     //delete
-    delete currentNode;
+    
 }

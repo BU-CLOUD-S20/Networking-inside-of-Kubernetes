@@ -1,11 +1,11 @@
 #include <tacopie/tacopie>
-#include "../base/Base.h"
+#include "../../base/Base.h"
 
 int main(int argc, char *argv[])
 {
     const int NODE = std::stoi(argv[1]);
 
-    IPv4 *ip = new IPv4("172.28.1.1", 8001);
+    IPv4 *ip = new IPv4("172.28.1.1", 8002);
     if (NODE == 1) {
         TCPServer *server = new TCPServer(ip);
         std::string res;

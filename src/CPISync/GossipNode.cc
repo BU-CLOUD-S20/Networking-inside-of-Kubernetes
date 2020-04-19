@@ -21,8 +21,8 @@ GossipNode::GossipNode(hash<string> hashFunc, int numCharHash, int numCharEntry,
 	} 
     else 
     {
-        std::cout << "Initialize Failed" << std::endl;
-        std::cout << "Getting host name and ip failed" << std::endl;
+        std::cout << "###Initialize Failed" << std::endl;
+        std::cout << "###Getting host name and ip failed" << std::endl;
         exit(1);
     }
     // init db path
@@ -49,7 +49,7 @@ bool GossipNode::commit(std::string log)
         auto resultCode = db_->put(key, value);
         if (resultCode != kvstore::ResultCode::SUCCEEDED)
         {
-            cout << "ResultCode: " << resultCode << endl;
+            cout << "###ResultCode: " << resultCode << endl;
             return false;
         }
         else
@@ -63,7 +63,7 @@ bool GossipNode::commit(std::string log)
         auto resultCode = db_->remove(key);
         if (resultCode != kvstore::ResultCode::SUCCEEDED)
         {
-            cout << "ResultCode: " << resultCode << endl;
+            cout << "###ResultCode: " << resultCode << endl;
             return false;
         }
         else
@@ -78,7 +78,7 @@ bool GossipNode::get(const std::string& key, std::string* value)
     auto resultCode = db_->get(key, value);
     if (resultCode != kvstore::ResultCode::SUCCEEDED)
     {
-        cout << "ResultCode: " << resultCode << endl;
+        cout << "###ResultCode: " << resultCode << endl;
         return false;
     }
     else
@@ -184,7 +184,7 @@ void GossipNode::processLogEntry()
     {
         if (!commit(log_[i]))
         {
-            cout << "this LogEntry commited failed : ";
+            cout << "###this LogEntry commited failed : ";
             cout << log_[i] << endl;
         }
     }
@@ -225,10 +225,11 @@ void GossipNode::showNeighbors()
 {
     if (neighbors_.empty())
     {
-        cout << "This node has no neighbor" << endl;
+        cout << "---This node has no neighbor" << endl;
+        cout << endl;
         return;
     }
-    cout << "Neighbors:" << endl;
+    cout << "---Neighbor(s):" << endl;
     for (auto neighbor : neighbors_) 
     {
         cout << neighbor << endl;

@@ -49,8 +49,8 @@
 
 #include "../utils/IPv4.h"
 #include "../utils/Time.h"
-#include "../utils/TCPClient.h"
-#include "../utils/TCPServer.h"
+#include "../utils/tcp_tacopie/TCPClient.h"
+#include "../utils/tcp_tacopie/TCPServer.h"
 #include "../utils/NetworkUtils.h"
 #include <tacopie/tacopie>
 
