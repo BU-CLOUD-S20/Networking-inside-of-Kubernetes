@@ -5,31 +5,26 @@ namespace niok
 namespace cpisync
 {
 
-GossipNode::GossipNode(string nodeName, int spaceId, string path,
-               hash<string> hashFunc, vector<string> initialElems)
+GossipNode::GossipNode(string nodeName, int spaceId, string path, //db
+                       hash<string> hashFunc, int numCharHash, int numCharEntry, //hashing
+                       vector<string> initialEntries) //initial log entries
+    :name_ (nodeName), rootPath_ (path), NUM_CHAR_HASH(numCharHash),NUM_CHAR_ENTRY(numCharEntry) //const variables
 {
-    name_ = nodeName;
-    rootPath_ = path;
     db_ = new kvstore::LevelEngine(spaceId, rootPath_);
     strHash = hashFunc;
-    //fill log and add defs
-    for (int i = 0; i < initialElems.size(); ++i)
+    //initialize log_ and hashDefs
+    for (int i = 0; i < initialEntries.size(); ++i)
     {
-        log_.push_back(initialElems[i]);
-        hashDefs[to_string(strHash(initialElems[i]))] = initialElems[i];
+        log_.push_back(initialEntries[i]);
+        hashDefs[to_string(strHash(initialEntries[i]))] = initialEntries[i];
     }
-    //cout << "All logs of current node:" << endl << endl;
-    for (int i = 0; i<log_.size(); ++i)
-    {
-        //cout << " " + log_.at(i);
-    }
-    //cout <<endl << endl;
+    processLogEntry();
 }
 
-bool GossipNode::commit(std::string log) 
+bool GossipNode::commit(std::string log)
 {
     vector<string> separated = logToKeyValue(log);
-    if (separated[0] == "P") 
+    if (separated[0] == "P")
     {
         string key = separated[2], value = separated[3];
         auto resultCode = db_->put(key, value);
@@ -79,8 +74,7 @@ bool GossipNode::put(std::string key, std::string value)
     string logEntry = keyValueToLog(key, value, "P");
     log_.push_back(logEntry);
     hashDefs[to_string(strHash(logEntry))] = logEntry;
-    
-    return commit(logEntry);
+    return true;
 }
 
 bool GossipNode::remove(std::string key)
@@ -88,74 +82,59 @@ bool GossipNode::remove(std::string key)
     string logEntry = keyValueToLog(key, "", "R");
     log_.push_back(logEntry);
     hashDefs[to_string(strHash(logEntry))] = logEntry;
-    
-    return commit(logEntry);
+    return true;
 }
 
-void addNeighbor(IPv4 *ip) 
+void GossipNode::sync(string host, bool server, int times)
 {
-    neighbors_.insert(ip);
-}
-
-void GossipNode::sync(string host, int NUM_CHAR, bool server)
-{
-    string res;
-    //sync hashes
-    // cout << "New hashed logs recieved:" << endl <<endl;
-    if (server)
+    int logSize = log_.size();
+    string hashes;
+    for (int  i = EOL; i <logSize; ++i)
     {
-        res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + getNewHashedLogs());
-        // cout<<res <<endl <<endl;
+        hashes+= " " + to_string(strHash(log_.at(i)));
     }
-    else
+    string cmd = (server)? "./sync " + host + " s "
+                 :"./sync " + host + " c ";
+    //sync hash
+    hashes = exec(cmd + to_string(NUM_CHAR_HASH) + hashes);
+    //save vector of unknownHashes for later
+    vector<string> unknownHashes;
+    char* tok = strtok(getCharsFromString(hashes), " ");
+    while (tok!= NULL)
     {
-        res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + getNewHashedLogs());
-        // cout<<res <<endl <<endl;
+        unknownHashes.push_back(tok);
+        tok = strtok (NULL, " ");
     }
-    //request hash definition
-    //cout << "Hash definitions requested:" <<endl <<endl;
-    if (server)
-    {
-        res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + res);
-        // cout<<res <<endl << endl;
-    }
-    else
-    {
-        res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + res);
-        //cout<<res <<endl <<endl;
-    }
-    //send hash definition
+    //request definitions
+    hashes = exec(cmd + to_string(NUM_CHAR_HASH) + hashes);
+    //send definitions
     string defs;
-    char* tok = strtok(getCharsFromString(res), " ");
+    tok = strtok(getCharsFromString(hashes), " ");
     while (tok!= NULL)
     {
         defs+= (" "+hashDefs[tok]);
         tok = strtok (NULL, " ");
     }
-    // cout << "New logs from sync:" << endl <<endl;
-    if (server)
-    {
-        res = exec("./sync " + host+ " s " + to_string(NUM_CHAR) + defs);
-    }
-    else
-    {
-        res = exec("./sync " + host+ " c " + to_string(NUM_CHAR) + defs);
-    }
-
-    tok = strtok(getCharsFromString(res), " ");
+    defs = exec(cmd + to_string(NUM_CHAR_ENTRY) + defs);
+    //update hashDefs and log_
+    tok = strtok(getCharsFromString(defs), " ");
+    int i = 0;
     while (tok!= NULL)
     {
+        hashDefs[unknownHashes.at(i)] = tok;
         log_.push_back(tok);
         tok = strtok (NULL, " ");
+        ++i;
     }
-    EOL = log_.size();
-    // cout << endl;
+    //update EOL
+    EOL = logSize;
 }
 
-string GossipNode::keyValueToLog(string key, string value, string op) {
+string GossipNode::keyValueToLog(string key, string value, string op)
+{
     Time t;
     string res;
-    if (op == "P") 
+    if (op == "P")
     {
         res = op + "+" + t.getCurrentTime() + "+" + key + "+" + value;
     }
@@ -166,11 +145,13 @@ string GossipNode::keyValueToLog(string key, string value, string op) {
     return res;
 }
 
-vector<string> GossipNode::logToKeyValue(string log) {
+vector<string> GossipNode::logToKeyValue(string log)
+{
     vector<string> res;
     istringstream is(log);
     string tmp;
-    while (getline(is, tmp, '+')) {
+    while (getline(is, tmp, '+'))
+    {
         res.push_back(tmp);
     }
     is.clear();
@@ -179,26 +160,23 @@ vector<string> GossipNode::logToKeyValue(string log) {
 
 void GossipNode::processLogEntry()
 {
-    int i = EOC;
-    for (i; i < log_.size(); i++) {
-        string logEntry = log_[i];
-        if (!commit(logEntry)) 
+    const int logSize = log_.size();
+    for (int i=EOC; i < logSize; ++i)
+    {
+        if (!commit(log_[i]))
         {
             cout << "this LogEntry commited failed : ";
-            cout << logEntry << endl;
+            cout << log_[i] << endl;
         }
     }
-    EOC = i;
-}
-string GossipNode::getNewHashedLogs()
-{
-    string res;
-    for (int  i = log_.size()-1; i > EOL -1; --i)
-    {
-        res+= " " + to_string(strHash(log_.at(i)));
-    }
-    return res;
+    EOC = logSize;
 }
 
+void GossipNode::addNeighbor(IPv4 *ip)
+{
+
+    neighbors_.insert(ip);
+}
 } // cpisync
 } // namespace niok
+

@@ -1,12 +1,12 @@
 /*
 *   Node class, where each node has a leveldb store and can communicate through CPISync.
+*   See niok.cc for example of usage.
 *   Zhe Deng Networking Inside of Kubernetes EC528 Spring 2020
 */
 
 #ifndef KVSTORE_GOSSIPNODE_H_
 #define KVSTORE_GOSSIPNODE_H_
 
-#pragma once
 #include <CPISync/Syncs/GenSync.h>
 #include <CPISync/Data/DataObject.h>
 #include "../kvstore/KVEngine.h"
@@ -17,7 +17,6 @@ using std::cout;
 using std::endl;
 using std::string;
 
-
 namespace niok
 {
 namespace cpisync
@@ -26,46 +25,35 @@ namespace cpisync
 class GossipNode
 {
 public:
-    //Metadata
-    string name_;
+
     //Constructor
     GossipNode(string nodeName, int spaceId, string path,
-               hash<string> hashFunc, vector<string> initialElems);
+               hash<string> hashFunc, int numCharHash, int numCharEntry,
+               vector<string> initialEntries);
     //delete db to prevent memory leaks as well as to pass leveldb status.ok()
     ~GossipNode()
     {
         delete db_;
     }
-    void sync(string HOST, int NUM_CHAR, bool server);
 
-    vector<string> logToKeyValue(string log);
-
-    string keyValueToLog(string key, string value, string op);
-
-    bool commit(std::string log);
-
+    //====Operations=====================
     bool get(const std::string& key, std::string* value);
-
     bool put(std::string key, std::string value);
-
     bool remove(std::string key);
-
     void addNeighbor(IPv4 *ip);
-
+    //====Commit Operations==============
     void processLogEntry();
-    //HELPER FUNCTIONS
-    //gets any new logs added (index>=EOL) separated with spaces, use with exec
-    string getNewHashedLogs();
-    //modified version of:
-    //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
+    //=====Sync Logs=====================
+    void sync(string host, bool server, int times = 1);
+    //=======Helper Functions============
+    vector<string> logToKeyValue(string log);
+    string keyValueToLog(string key, string value, string op);
+    //used in processLogEntry()
+    bool commit(std::string log);
+    //modified version of: https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
     string exec(string strCmd)
     {
-        char* cmd= new char[strCmd.length()+1];
-        for (int i = 0; i<strCmd.length(); ++i)
-        {
-            cmd[i] = strCmd[i];
-        }
-        cmd[strCmd.length()] = '\n'; //always make sure to terminate commands
+        char* cmd= getCharsFromString(strCmd);
         std::array<char, 128> buffer;
         std::string result;
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
@@ -80,31 +68,33 @@ public:
         delete cmd;
         return result;
     }
+    //convert a string 'str' to char* and append with 'append'
     char* getCharsFromString(string str)
     {
-        char* res= new char[str.length()+1];
-        for (int i = 0; i<str.length(); ++i)
-        {
-            res[i] = str[i];
-        }
-        res[str.length()] = ' '; //end string with delimiter
+        char* res=new char[str.length()+1];
+        str.copy(res, str.size());
+        res[str.length()] = '\0'; //end string with null
         return res;
     }
+
 private:
+    //Metadata
+    const string name_;
     //log
-    vector <string> log_;
+    vector <string> log_; //vector of log entries
     unordered_set<IPv4*> neighbors_;
     int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
     int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync
-    hash<string> strHash;
-    map <string, string> hashDefs;
+    const int NUM_CHAR_ENTRY; //max num char in log entries
+    const int NUM_CHAR_HASH; //num char in each hash (i.e. use 20 for 64 bit hash)
+    hash<string> strHash; //hash function to use
+    map <string, string> hashDefs; //definitions of hashed log entries
     //KV
     kvstore::LevelEngine* db_;
-    string rootPath_;
-
+    const string rootPath_;
     const string HOST = "172.28.1.1";
-    const int NUM_CHAR = 64;
+
 };
 
 } //namespace cpisync
