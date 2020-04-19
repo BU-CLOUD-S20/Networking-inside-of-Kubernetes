@@ -1,6 +1,4 @@
-#include "TCPClient.h"
-#include "TCPServer.h"
-
+#include <tacopie/tacopie>
 #include "../base/Base.h"
 
 int main(int argc, char *argv[])

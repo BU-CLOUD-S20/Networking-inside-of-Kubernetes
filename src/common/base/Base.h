@@ -43,10 +43,15 @@
 #include <cassert>
 #include <cmath>
 
+#include <netdb.h> /* struct hostent */
+#include <arpa/inet.h> /* inet_ntop */
 #include <signal.h>
 
 #include "../utils/IPv4.h"
 #include "../utils/Time.h"
+#include "../utils/TCPClient.h"
+#include "../utils/TCPServer.h"
+#include "../utils/NetworkUtils.h"
 #include <tacopie/tacopie>
 
 #endif

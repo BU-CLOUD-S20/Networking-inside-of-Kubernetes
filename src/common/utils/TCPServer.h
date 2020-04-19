@@ -2,6 +2,7 @@
 #define COMMON_UTILS_TCPSERVER_H_
 
 #include "../base/Base.h"
+#include <tacopie/tacopie>
 
 class TCPServer 
 {
@@ -19,9 +20,11 @@ public:
     }
 
     void start(std::string &ip) {
+        std::cout << "TCP Server started listenning..." << std::endl;
         std::string tmp;
         server_.start(ip_->getIP(), ip_->getPort(), [&](const std::shared_ptr<tacopie::tcp_client>& client) -> bool {
             tmp = client->get_host();
+            std::cout << "Received new request from: "<< tmp << std::endl;
             cv.notify_all();
             return true;
         });

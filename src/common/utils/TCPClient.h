@@ -2,6 +2,7 @@
 #define COMMON_UTILS_TCPCLIENT_H_
 
 #include "../base/Base.h"
+#include <tacopie/tacopie>
 
 class TCPClient 
 {

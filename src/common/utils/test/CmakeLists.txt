@@ -1,0 +1,7 @@
+niok_add_test(
+    NAME    network_utils_test
+    SOURCES NetworkUtils.cc
+    OBJECTS 
+    LIBRARIES 
+        ${GOOGLETEST_LIBRARIES}
+)
