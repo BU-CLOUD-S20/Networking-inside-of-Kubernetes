@@ -27,17 +27,15 @@ public:
         {
             server_.stop();
         }
-        else 
-        {
-            std::cout << "...TCP Server started listenning..." << std::endl;
-        }
 
         std::string tmp;
         try 
         {
             server_.start(ip_->getIP(), ip_->getPort(), [&](const std::shared_ptr<tacopie::tcp_client>& client) -> bool {
                 tmp = client->get_host();
-                std::cout << "---Received new request from: "<< tmp << std::endl;
+                std::cout << std::endl;
+                std::cout << "---Received new request from: "<< tmp << ":" << client->get_port() << std::endl;
+                std::cout << std::endl;
                 cv.notify_all();
                 return true;
             });

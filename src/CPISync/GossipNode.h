@@ -44,7 +44,7 @@ public:
     void showNeighbors();
     //====TCP Connection=================
     void static listenTCP();
-    void connectTCP(std::vector<string> &ips);
+    std::vector<string> connectTCP(std::vector<string> &ips);
     //====Commit Operations==============
     void processLogEntry();
     //=====Sync Logs=====================

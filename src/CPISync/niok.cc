@@ -34,6 +34,7 @@ void listenTCP(string ip, int port)
         server->start(res); 
         currentNode->addNeighbor(res);
         server->stop();
+        cout << currentNode->name_ << ": ";
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
@@ -119,7 +120,6 @@ int main(int argc, char *argv[])
         }
         else if (inputVec[0].compare("join")==0)
         {
-            cout << "start joining..." << endl;
             vector<string> ips;
             for (int i = 1; i < inputVec.size(); i++) 
             {
@@ -130,6 +130,8 @@ int main(int argc, char *argv[])
         else if (inputVec[0].compare("exit")==0)
         {
             delete currentNode;
+            cout << "---Thanks for using NIOK! See you" << endl;
+            cout << endl;
             exit(0);
         }
         else

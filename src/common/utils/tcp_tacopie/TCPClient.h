@@ -19,23 +19,25 @@ public:
         cv.notify_all();
     }
 
-    void start() {
+    std::vector<std::string> start() {
+        std::vector<std::string> res;
         for (auto ip : ips_) {
             std::string addr = ip->getIP();
             int port = ip->getPort();
-            std::cout << "...connecting " << addr << ":" << port << std::endl; 
             try
             {
-                client_.connect(addr, port);
+                std::cout << "---connecting " << addr << ":" << port << std::endl; 
+                client_.connect(addr, port, 500);
+                std::cout << "---connected " << addr << ":" << port << std::endl;
                 client_.disconnect();
+                res.push_back(addr);
             }
             catch(const std::exception& e)
             {
-                std::cout << "###TCP Client error: " << e.what() << std::endl;
+                std::cout << "###TCP Client error: " << e.what() << " when connecting " << addr << ":" << port << std::endl;
             }
-            
-            
         }
+        return res;
     }
 };
 #endif

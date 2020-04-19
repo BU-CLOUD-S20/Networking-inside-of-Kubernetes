@@ -196,7 +196,7 @@ void GossipNode::listenTCP()
     
 }
 
-void GossipNode::connectTCP(std::vector<string> &ips)
+std::vector<std::string> GossipNode::connectTCP(std::vector<string> &ips)
 {
     std::vector<IPv4*> v;
     for (auto ip : ips) 
@@ -204,13 +204,14 @@ void GossipNode::connectTCP(std::vector<string> &ips)
         v.push_back(new IPv4(ip, TCP_PORT));
     }
     TCPClient *client = new TCPClient(v);
-    client->start();
+    auto res = client->start();
+    return res;
 }
 
 void GossipNode::joinCluster(std::vector<string> &ips) 
 {
-    connectTCP(ips);
-    for (auto ip : ips) 
+    auto res = connectTCP(ips);
+    for (auto ip : res) 
     {
         neighbors_.insert(ip);
     }
