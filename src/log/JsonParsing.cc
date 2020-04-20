@@ -28,18 +28,18 @@ void JsonParsing::garbageCollect(string timestamp) {
 
     // iterate through the logs 
     // only add logs which meet the time requirement
-    json cleansed;
+    json cleansedJson;
     for (json::iterator it = j.begin(); it != j.end(); ++it) {
         // delete logs older than 10 minutes
         if (std::stoll(it.key()) > time) {
-            cleansed[it.key()] = { it.value() };
+            cleansedJson[it.key()] = { it.value() };
         }
     }
 
     // output json object to the file
     std::ofstream log;
     log.open(name_);
-    log << cleansed;
+    log << cleansedJson;
     log.close();
 
 }
