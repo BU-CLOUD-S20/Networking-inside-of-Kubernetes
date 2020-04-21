@@ -30,8 +30,8 @@ void listenTCP(string ip, int port)
     TCPServer *server = new TCPServer(IP);
     std::string res;
     while (true)
-    {   
-        server->start(res); 
+    {
+        server->start(res);
         currentNode->addNeighbor(res);
         server->stop();
         cout << currentNode->name_ << ": ";
@@ -39,9 +39,9 @@ void listenTCP(string ip, int port)
     }
 }
 
-void cli() 
+void cli()
 {
-    
+
 }
 
 int main(int argc, char *argv[])
@@ -52,13 +52,13 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         cout << "NAME:" << endl << "   niok - Command Line Interface for niok." << endl;
-        cout << "USAGE:" << endl << "   niok [node name] [initial elements]"<< endl;
+        cout << "USAGE:" << endl << "   niok [node name] [server IP] [initial elements]"<< endl;
         exit (EXIT_FAILURE);
     }
     //==============================================================================================
     //create a node
     vector<string> initialElems;
-    for (int i = 2; i< argc; ++i)
+    for (int i = 3; i< argc; ++i)
     {
         initialElems.push_back(argv[i]);
     }
@@ -69,12 +69,12 @@ int main(int argc, char *argv[])
         server = true;
     else
         server = false;
-    
+
     // TCP thread
     std::thread tcp_thread(listenTCP, currentNode->ip_, TCP_PORT);
     //std::thread main_thread(cli);
     //main_thread.join();
-    
+
 
     while (true)
     {
@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
         }
         else if (inputVec[0].compare("sync")==0)
         {
+            doLogs = true;
         }
         else if (inputVec[0].compare("show")==0)
         {
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
         else if (inputVec[0].compare("join")==0)
         {
             vector<string> ips;
-            for (int i = 1; i < inputVec.size(); i++) 
+            for (int i = 1; i < inputVec.size(); i++)
             {
                 ips.push_back(inputVec[i]);
             }
@@ -141,22 +142,23 @@ int main(int argc, char *argv[])
             cout << "2. get [key]" <<endl;
             cout << "3. del [key]" <<endl;
             cout << "4. show (show neighbors of current node)" << endl;
-            
+
         }
 
-        if (doLogs) 
+        if (doLogs)
         {
             //process
             currentNode->processLogEntry();
             //sync
-            currentNode->sync(currentNode->ip_, server);
+            currentNode->sync(argv[2], server); //use 172.28.1.1
             //process after sync
             currentNode->processLogEntry();
         }
+        doLogs = false;
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
     tcp_thread.join();
 
     //delete
-    
+
 }
