@@ -5,7 +5,7 @@
 [Demo 2](https://docs.google.com/presentation/d/118YX5ALFa08UfWFQjXKwZok-rmvdTvqiiVNljjjsXfg/edit?usp=sharing)  
 [Demo 3](https://docs.google.com/presentation/d/142T3vpOa8HJgMVeeW43rnJGhvw62su00DX_PcEBc43o/edit?usp=sharing)  
 [Demo 4](https://docs.google.com/presentation/d/17R5dB9XDbUxkLGO7eynz5Ey_Jk6t1EQXyuoymtE9mOo/edit?usp=sharing)    
-Demo 5  
+[Demo 5](https://docs.google.com/presentation/d/1ABRTniuiQnKOEnzjII-o9OAfOhxerbpnJR1S9sTKy1g/edit?usp=sharing)  
 [GFS](https://docs.google.com/presentation/d/13toeO3h6mSGOpCpLhhtjaLkJJfPJ-Vc3zHOx81E8Ps0/edit?usp=sharing)  
 ## Contributors:   
 Mentors:  
@@ -126,12 +126,12 @@ Global Architectural Structure of the Project:
 This gif illustrates the "gossip protocol" we are trying to implement. When a node receives a request, it updates its log and then sends it to its neighbors to reconcile. In this gif, once node 1 reconciles with its neighbors (2, 4, and 7), any client communicating with node 1 will see their request as a success. This process then repeats itself until the update propagates throughout the cluster and a consensus is achieved.       
 
 ## 5. Acceptance criteria
-+ Deploying our C++ implementation of the gossip protocol using [CPISync](https://github.com/trachten/cpisync) and [LevelDB](https://github.com/google/leveldb) to containers 
-+ Benchmarking our database against etcd to demonstrate significant scalability and performance improvements.
++ C++ implementation of the gossip protocol using [CPISync](https://github.com/trachten/cpisync) and [LevelDB](https://github.com/google/leveldb)
 + Garbage collection for old log entries
 
 ## 6. Stretch Goals 
 + Detecting failures during networking
++ Benchmark operations against etcd
 + Integrate our database into etcd and run with Kubernetes.  
 
 ## 7. Release Planning
