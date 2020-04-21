@@ -5,12 +5,31 @@ namespace niok
 namespace cpisync
 {
 
-GossipNode::GossipNode(string nodeName, int spaceId, string path, //db
-                       hash<string> hashFunc, int numCharHash, int numCharEntry, //hashing
+GossipNode::GossipNode(hash<string> hashFunc, int numCharHash, int numCharEntry, //hashing
                        vector<string> initialEntries) //initial log entries
-    :name_ (nodeName), rootPath_ (path), NUM_CHAR_HASH(numCharHash),NUM_CHAR_ENTRY(numCharEntry) //const variables
+    :NUM_CHAR_HASH(numCharHash),NUM_CHAR_ENTRY(numCharEntry) //const variables
 {
-    db_ = new kvstore::LevelEngine(spaceId, rootPath_);
+    // initialize node's IP and Name
+    NetworkUtils *network = new NetworkUtils();
+    std::string hostName;
+	std::string Ip;
+    bool ret = network->GetHostInfo(hostName, Ip);
+	if (true == ret) 
+    {
+		ip_ = Ip;
+        name_ = hostName;
+	} 
+    else 
+    {
+        std::cout << "###Initialize Failed" << std::endl;
+        std::cout << "###Getting host name and ip failed" << std::endl;
+        exit(1);
+    }
+    // init db path
+    rootPath_ = "/tmp/" + name_;
+    // init db
+    db_ = new kvstore::LevelEngine(SPACE_ID, rootPath_);
+
     strHash = hashFunc;
     //initialize log_ and hashDefs
     for (int i = 0; i < initialEntries.size(); ++i)
@@ -30,7 +49,7 @@ bool GossipNode::commit(std::string log)
         auto resultCode = db_->put(key, value);
         if (resultCode != kvstore::ResultCode::SUCCEEDED)
         {
-            cout << "ResultCode: " << resultCode << endl;
+            cout << "###ResultCode: " << resultCode << endl;
             return false;
         }
         else
@@ -44,7 +63,7 @@ bool GossipNode::commit(std::string log)
         auto resultCode = db_->remove(key);
         if (resultCode != kvstore::ResultCode::SUCCEEDED)
         {
-            cout << "ResultCode: " << resultCode << endl;
+            cout << "###ResultCode: " << resultCode << endl;
             return false;
         }
         else
@@ -59,7 +78,7 @@ bool GossipNode::get(const std::string& key, std::string* value)
     auto resultCode = db_->get(key, value);
     if (resultCode != kvstore::ResultCode::SUCCEEDED)
     {
-        cout << "ResultCode: " << resultCode << endl;
+        cout << "###ResultCode: " << resultCode << endl;
         return false;
     }
     else
@@ -165,17 +184,58 @@ void GossipNode::processLogEntry()
     {
         if (!commit(log_[i]))
         {
-            cout << "this LogEntry commited failed : ";
+            cout << "###this LogEntry commited failed : ";
             cout << log_[i] << endl;
         }
     }
     EOC = logSize;
 }
 
-void GossipNode::addNeighbor(IPv4 *ip)
+void GossipNode::listenTCP()
 {
+    
+}
 
+std::vector<std::string> GossipNode::connectTCP(std::vector<string> &ips)
+{
+    std::vector<IPv4*> v;
+    for (auto ip : ips) 
+    {
+        v.push_back(new IPv4(ip, TCP_PORT));
+    }
+    TCPClient *client = new TCPClient(v);
+    auto res = client->start();
+    return res;
+}
+
+void GossipNode::joinCluster(std::vector<string> &ips) 
+{
+    auto res = connectTCP(ips);
+    for (auto ip : res) 
+    {
+        neighbors_.insert(ip);
+    }
+}
+
+void GossipNode::addNeighbor(string ip)
+{
     neighbors_.insert(ip);
+}
+
+void GossipNode::showNeighbors()
+{
+    if (neighbors_.empty())
+    {
+        cout << "---This node has no neighbor" << endl;
+        cout << endl;
+        return;
+    }
+    cout << "---Neighbor(s):" << endl;
+    for (auto neighbor : neighbors_) 
+    {
+        cout << neighbor << endl;
+    }
+    cout << endl;
 }
 } // cpisync
 } // namespace niok

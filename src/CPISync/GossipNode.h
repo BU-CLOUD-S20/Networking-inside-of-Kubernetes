@@ -27,8 +27,7 @@ class GossipNode
 public:
 
     //Constructor
-    GossipNode(string nodeName, int spaceId, string path,
-               hash<string> hashFunc, int numCharHash, int numCharEntry,
+    GossipNode(hash<string> hashFunc, int numCharHash, int numCharEntry,
                vector<string> initialEntries);
     //delete db to prevent memory leaks as well as to pass leveldb status.ok()
     ~GossipNode()
@@ -40,7 +39,12 @@ public:
     bool get(const std::string& key, std::string* value);
     bool put(std::string key, std::string value);
     bool remove(std::string key);
-    void addNeighbor(IPv4 *ip);
+    void joinCluster(std::vector<string> &ips);
+    void addNeighbor(string ip);
+    void showNeighbors();
+    //====TCP Connection=================
+    void static listenTCP();
+    std::vector<string> connectTCP(std::vector<string> &ips);
     //====Commit Operations==============
     void processLogEntry();
     //=====Sync Logs=====================
@@ -77,12 +81,13 @@ public:
         return res;
     }
 
+    string name_;
+    string ip_;
+    string rootPath_;
 private:
-    //Metadata
-    const string name_;
     //log
     vector <string> log_; //vector of log entries
-    unordered_set<IPv4*> neighbors_;
+    unordered_set<string> neighbors_;
     int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
     int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync
@@ -92,8 +97,9 @@ private:
     map <string, string> hashDefs; //definitions of hashed log entries
     //KV
     kvstore::LevelEngine* db_;
-    const string rootPath_;
-    const string HOST = "172.28.1.1";
+    const int SPACE_ID = 0;
+    const int CPI_PORT = 8001;
+    const int TCP_PORT = 8002;
 
 };
 
