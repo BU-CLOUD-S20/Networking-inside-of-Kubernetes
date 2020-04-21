@@ -18,6 +18,8 @@ public:
 
     };
 
+    void garbageCollect(std::string timestamp);
+
     std::string getValueFromKey(std::string key);
 
     void addLogToFile(std::string key, std::string value);

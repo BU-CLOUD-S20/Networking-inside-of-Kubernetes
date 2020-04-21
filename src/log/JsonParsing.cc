@@ -9,6 +9,41 @@ JsonParsing::JsonParsing(string name) {
     name_ = name;
 }
 
+// removes logs which are 10 minutes older than the current  
+void JsonParsing::garbageCollect(string timestamp) {
+    // current time minus 10 minutes
+    long long int time = std::stoll(timestamp) - 600000;
+
+    // read in the file
+    std::ifstream test(name_);
+    std::stringstream buffer;
+    buffer << test.rdbuf();
+
+    // make a json object out of the file contents
+    // and append a new key and value
+    json j;
+    if (!buffer.str().empty()) {
+      j = json::parse(buffer.str());
+    }
+
+    // iterate through the logs 
+    // only add logs which meet the time requirement
+    json cleansedJson;
+    for (json::iterator it = j.begin(); it != j.end(); ++it) {
+        // delete logs older than 10 minutes
+        if (std::stoll(it.key()) > time) {
+            cleansedJson[it.key()] = { it.value() };
+        }
+    }
+
+    // output json object to the file
+    std::ofstream log;
+    log.open(name_);
+    log << cleansedJson;
+    log.close();
+
+}
+
 // returns a value from a given key 
 string JsonParsing::getValueFromKey(string key) {
     // read in the file
@@ -80,6 +115,8 @@ std::string JsonParsing::addLogToFileTimestamp(string value) {
     log.open(name_);
     log << j;
     log.close();
+
+    garbageCollect(ss.str());
 
     return ss.str();
 }
