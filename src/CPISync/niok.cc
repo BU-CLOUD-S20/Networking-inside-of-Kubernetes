@@ -18,8 +18,7 @@ using std::thread;
 
 GossipNode* currentNode;
 
-bool server;
-const int TCP_PORT = 8002;
+const int TCP_PORT = 8003;
 const int NUM_CHAR_HASH = 20; //default 20
 const int NUM_CHAR_ENTRY = 256;
 hash<string> strHash;
@@ -34,14 +33,17 @@ void listenTCP(string ip, int port)
         server->start(res); 
         currentNode->addNeighbor(res);
         server->stop();
-        cout << currentNode->name_ << ": ";
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
-void cli() 
-{
-    
+void cpi() 
+{    
+    while (true)
+    {
+        currentNode->sync(currentNode->ip_, true);
+        currentNode->processLogEntry();
+    }
 }
 
 int main(int argc, char *argv[])
@@ -64,16 +66,10 @@ int main(int argc, char *argv[])
     }
     currentNode = new GossipNode(strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, initialElems);
 
-    //use ./niok 1 or ./niok 2
-    if (NODE == 1)
-        server = true;
-    else
-        server = false;
-    
     // TCP thread
     std::thread tcp_thread(listenTCP, currentNode->ip_, TCP_PORT);
-    //std::thread main_thread(cli);
-    //main_thread.join();
+    // CPI server thread
+    std::thread cpi_thread(cpi);
     
 
     while (true)
@@ -103,8 +99,9 @@ int main(int argc, char *argv[])
         else if (inputVec[0].compare("get")==0)
         {
             string res;
-            currentNode->get(inputVec[1], &res);
-            cout << res << endl;
+            if (currentNode->get(inputVec[1], &res))
+                cout << inputVec[1] << " : " << res << endl;
+            cout << endl;
         }
         else if (inputVec[0].compare("del")==0)
         {
@@ -113,6 +110,7 @@ int main(int argc, char *argv[])
         }
         else if (inputVec[0].compare("sync")==0)
         {
+            doLogs = true;
         }
         else if (inputVec[0].compare("show")==0)
         {
@@ -127,6 +125,10 @@ int main(int argc, char *argv[])
             }
             currentNode->joinCluster(ips);
         }
+        else if (inputVec[0].compare("clear")==0)
+        {
+            system("clear");
+        }
         else if (inputVec[0].compare("exit")==0)
         {
             delete currentNode;
@@ -140,22 +142,29 @@ int main(int argc, char *argv[])
             cout << "1. put [key] [value]" <<endl;
             cout << "2. get [key]" <<endl;
             cout << "3. del [key]" <<endl;
-            cout << "4. show (show neighbors of current node)" << endl;
-            
+            cout << "4. join [IPs]" << endl;
+            cout << "5. show (show neighbors of current node)" << endl;
+            cout << "6. exit" << endl;
+            cout << endl;
         }
 
         if (doLogs) 
         {
             //process
             currentNode->processLogEntry();
-            //sync
-            currentNode->sync(currentNode->ip_, server);
+            for (auto neighbor : currentNode->neighbors_)
+            {
+                currentNode->sync(neighbor, false);
+                system("./tmp > /dev/null 2>&1");
+            }
+            
             //process after sync
             currentNode->processLogEntry();
         }
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
     tcp_thread.join();
+    cpi_thread.join();
 
     //delete
     

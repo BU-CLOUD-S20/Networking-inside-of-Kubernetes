@@ -10,7 +10,7 @@ services:
       USER: root
     expose:
       - "8001"
-      - "8002"
+      - "8003"
     volumes:
       - ../../Networking-inside-of-Kubernetes:/root/project
     networks:
@@ -28,7 +28,7 @@ services:
       USER: root
     expose:
       - "8001"
-      - "8002"
+      - "8003"
     volumes:
       - ../../Networking-inside-of-Kubernetes:/root/project
     networks:
@@ -46,7 +46,7 @@ services:
       USER: root
     expose:
       - "8001"
-      - "8002"
+      - "8003"
     volumes:
       - ../../Networking-inside-of-Kubernetes:/root/project
     networks:

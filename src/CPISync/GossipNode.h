@@ -84,10 +84,10 @@ public:
     string name_;
     string ip_;
     string rootPath_;
+    unordered_set<string> neighbors_;
 private:
     //log
     vector <string> log_; //vector of log entries
-    unordered_set<string> neighbors_;
     int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
     int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync
@@ -98,8 +98,7 @@ private:
     //KV
     kvstore::LevelEngine* db_;
     const int SPACE_ID = 0;
-    const int CPI_PORT = 8001;
-    const int TCP_PORT = 8002;
+    const int TCP_PORT = 8003;
 
 };
 
