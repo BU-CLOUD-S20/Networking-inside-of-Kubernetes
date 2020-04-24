@@ -29,18 +29,19 @@ void listenTCP(string ip, int port)
     TCPServer *server = new TCPServer(IP);
     std::string res;
     while (true)
-    {   
-        server->start(res); 
+    {
+        server->start(res);
         currentNode->addNeighbor(res);
         server->stop();
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
-void cpi() 
-{    
+void cpi()
+{
     while (true)
     {
+     currentNode->processLogEntry();
         currentNode->sync(currentNode->ip_, true);
         currentNode->processLogEntry();
     }
@@ -48,13 +49,12 @@ void cpi()
 
 int main(int argc, char *argv[])
 {
-    const int NODE = stoi(argv[1]);
     //==============================================================================================
-    //handle incorrect usage
-    if (argc < 2)
+    //help
+    if (argc == 2 && strcmp(argv[1],"help")==0)
     {
         cout << "NAME:" << endl << "   niok - Command Line Interface for niok." << endl;
-        cout << "USAGE:" << endl << "   niok [node name] [initial elements]"<< endl;
+        cout << "USAGE:" << endl << "   ./niok [initial elements]"<< endl;
         exit (EXIT_FAILURE);
     }
     //==============================================================================================
@@ -65,13 +65,10 @@ int main(int argc, char *argv[])
         initialElems.push_back(argv[i]);
     }
     currentNode = new GossipNode(strHash, NUM_CHAR_HASH, NUM_CHAR_ENTRY, initialElems);
-
     // TCP thread
     std::thread tcp_thread(listenTCP, currentNode->ip_, TCP_PORT);
     // CPI server thread
     std::thread cpi_thread(cpi);
-    
-
     while (true)
     {
         // FLAG - need to process logs or not
@@ -119,7 +116,7 @@ int main(int argc, char *argv[])
         else if (inputVec[0].compare("join")==0)
         {
             vector<string> ips;
-            for (int i = 1; i < inputVec.size(); i++) 
+            for (int i = 1; i < inputVec.size(); i++)
             {
                 ips.push_back(inputVec[i]);
             }
@@ -148,24 +145,18 @@ int main(int argc, char *argv[])
             cout << endl;
         }
 
-        if (doLogs) 
+        if (doLogs)
         {
             //process
             currentNode->processLogEntry();
-            for (auto neighbor : currentNode->neighbors_)
-            {
-                currentNode->sync(neighbor, false);
-                system("./tmp > /dev/null 2>&1");
-            }
-            
+            currentNode->sync(currentNode->neighbors_, false);
             //process after sync
             currentNode->processLogEntry();
         }
-        //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
     tcp_thread.join();
     cpi_thread.join();
 
     //delete
-    
+
 }
