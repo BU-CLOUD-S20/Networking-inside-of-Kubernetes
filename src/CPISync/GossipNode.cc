@@ -146,7 +146,8 @@ void GossipNode::sync(string host, bool server, int times)
         ++i;
     }
     //update EOL
-    EOL = logSize;
+    // Fuyao: In my approach now all the logs need to be synced
+    // EOL = logSize;
 }
 
 string GossipNode::keyValueToLog(string key, string value, string op)

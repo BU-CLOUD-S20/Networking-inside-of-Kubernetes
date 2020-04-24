@@ -29,6 +29,7 @@ public:
                 std::cout << "---connecting " << addr << ":" << port << std::endl; 
                 client_.connect(addr, port, 500);
                 std::cout << "---connected " << addr << ":" << port << std::endl;
+                std::cout << std::endl;
                 client_.disconnect();
                 res.push_back(addr);
             }
