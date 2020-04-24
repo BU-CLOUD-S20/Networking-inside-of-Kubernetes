@@ -25,6 +25,7 @@ public:
     {
         if (server_.is_running())
         {
+            std::cout << "###tcp server is running, stop now" << std::endl;
             server_.stop();
         }
 
@@ -42,7 +43,11 @@ public:
         }
         catch (const std::exception& e)
         {
-            std::cout << "###TCP Server error: " << e.what() << std::endl;
+            system("./killPid.sh 8003 > /dev/null 2>&1");
+            system("./killPid.sh 8003 > /dev/null 2>&1");
+            system("./killPid.sh 8003 > /dev/null 2>&1");
+            //std::cout << "###TCP Server error: " << e.what() << std::endl;
+            cv.notify_all();
             return;
         }
 
