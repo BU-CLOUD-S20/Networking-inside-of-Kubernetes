@@ -150,8 +150,10 @@ void GossipNode::sync(string host, bool server, int times)
     // EOL = logSize;
 }
 
+// old code is commented out
 string GossipNode::keyValueToLog(string key, string value, string op)
 {
+    /*
     Time t;
     string res;
     if (op == "P")
@@ -163,12 +165,39 @@ string GossipNode::keyValueToLog(string key, string value, string op)
         res = op + "+" + t.getCurrentTime() + "+" + key;
     }
     return res;
+    */
+    JsonParsing *jp = new JsonParsing("log.json");
+    string res;
+    if (op == "P")
+    {
+        res = op + "+" + jp -> JsonParsing::getTimestamp() + "+" + key + "+" + value;
+    }
+    else if (op == "R")
+    {
+        res = op + "+" + jp -> JsonParsing::getTimestamp() + "+" + key;
+    }
+
+    return JsonParsing::addLogToFileTimestamp(res);
 }
 
+// old code is commented out
 vector<string> GossipNode::logToKeyValue(string log)
 {
+    /*
     vector<string> res;
     istringstream is(log);
+    string tmp;
+    while (getline(is, tmp, '+'))
+    {
+        res.push_back(tmp);
+    }
+    is.clear();
+    return res;
+    */
+    JsonParsing *jp = new JsonParsing("log.json");
+
+    vector<string> res;
+    istringstream is(jp -> JsonParsing::getValueFromKey(log));
     string tmp;
     while (getline(is, tmp, '+'))
     {
