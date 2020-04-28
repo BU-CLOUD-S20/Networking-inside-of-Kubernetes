@@ -1,4 +1,5 @@
 #include "GossipNode.h"
+#include "../log/JsonParsing.h"
 
 namespace niok
 {
