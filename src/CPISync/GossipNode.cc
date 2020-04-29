@@ -12,14 +12,14 @@ GossipNode::GossipNode(hash<string> hashFunc, int numCharHash, int numCharEntry,
     // initialize node's IP and Name
     NetworkUtils *network = new NetworkUtils();
     std::string hostName;
-	std::string Ip;
+    std::string Ip;
     bool ret = network->GetHostInfo(hostName, Ip);
-	if (true == ret) 
+    if (true == ret)
     {
-		ip_ = Ip;
+        ip_ = Ip;
         name_ = hostName;
-	} 
-    else 
+    }
+    else
     {
         std::cout << "###Initialize Failed" << std::endl;
         std::cout << "###Getting host name and ip failed" << std::endl;
@@ -104,11 +104,11 @@ bool GossipNode::remove(std::string key)
     return true;
 }
 
-void GossipNode::sync(string host, bool server, int times)
+void GossipNode::sync(string host, bool server)
 {
     int logSize = log_.size();
     string hashes;
-    for (int  i = EOL; i <logSize; ++i)
+    for (int  i = EOL[host]; i <logSize; ++i)
     {
         hashes+= " " + to_string(strHash(log_.at(i)));
     }
@@ -146,8 +146,59 @@ void GossipNode::sync(string host, bool server, int times)
         ++i;
     }
     //update EOL
-    // Fuyao: In my approach now all the logs need to be synced
-    // EOL = logSize;
+    EOL[host] = log_.size();
+}
+
+void GossipNode::sync(unordered_set<string>& hosts, bool server)
+{
+//sync for 'times' times
+    int logSize = log_.size();
+    for (string host : hosts)
+    {
+        string hashes;
+        for (int  i = EOL[host]; i <logSize; ++i)
+        {
+            hashes+= " " + to_string(strHash(log_.at(i)));
+        }
+        string cmd = (server)? "./sync " + host + " s "
+                     :"./sync " + host + " c ";
+        //sync hash
+        hashes = exec(cmd + to_string(NUM_CHAR_HASH) + hashes);
+        //save vector of unknownHashes for later
+        vector<string> unknownHashes;
+        char* tok = strtok(getCharsFromString(hashes), " ");
+        while (tok!= NULL)
+        {
+            unknownHashes.push_back(tok);
+            tok = strtok (NULL, " ");
+        }
+        //request definitions
+        hashes = exec(cmd + to_string(NUM_CHAR_HASH) + hashes);
+        //send definitions
+        string defs;
+        tok = strtok(getCharsFromString(hashes), " ");
+        while (tok!= NULL)
+        {
+            defs+= (" "+hashDefs[tok]);
+            tok = strtok (NULL, " ");
+        }
+        defs = exec(cmd + to_string(NUM_CHAR_ENTRY) + defs);
+        //update hashDefs and log_
+        tok = strtok(getCharsFromString(defs), " ");
+        int i = 0;
+        while (tok!= NULL)
+        {
+            hashDefs[unknownHashes.at(i)] = tok;
+            log_.push_back(tok);
+            tok = strtok (NULL, " ");
+            ++i;
+        }
+        //kill server sync if needed
+        if (!server)
+            system("./tmp > /dev/null 2>&1");
+         //update EOL
+         EOL[host] = log_.size();
+    }
 }
 
 string GossipNode::keyValueToLog(string key, string value, string op)
@@ -194,13 +245,13 @@ void GossipNode::processLogEntry()
 
 void GossipNode::listenTCP()
 {
-    
+
 }
 
 std::vector<std::string> GossipNode::connectTCP(std::vector<string> &ips)
 {
     std::vector<IPv4*> v;
-    for (auto ip : ips) 
+    for (auto ip : ips)
     {
         v.push_back(new IPv4(ip, TCP_PORT));
     }
@@ -209,10 +260,10 @@ std::vector<std::string> GossipNode::connectTCP(std::vector<string> &ips)
     return res;
 }
 
-void GossipNode::joinCluster(std::vector<string> &ips) 
+void GossipNode::joinCluster(std::vector<string> &ips)
 {
     auto res = connectTCP(ips);
-    for (auto ip : res) 
+    for (auto ip : res)
     {
         neighbors_.insert(ip);
     }
@@ -221,6 +272,8 @@ void GossipNode::joinCluster(std::vector<string> &ips)
 void GossipNode::addNeighbor(string ip)
 {
     neighbors_.insert(ip);
+    //init each neighbor EOL
+    EOL[ip] = 0;
 }
 
 void GossipNode::showNeighbors()
@@ -232,7 +285,7 @@ void GossipNode::showNeighbors()
         return;
     }
     cout << "---Neighbor(s):" << endl;
-    for (auto neighbor : neighbors_) 
+    for (auto neighbor : neighbors_)
     {
         cout << neighbor << endl;
     }

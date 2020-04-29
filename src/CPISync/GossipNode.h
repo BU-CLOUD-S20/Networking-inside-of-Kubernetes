@@ -48,7 +48,8 @@ public:
     //====Commit Operations==============
     void processLogEntry();
     //=====Sync Logs=====================
-    void sync(string host, bool server, int times = 1);
+    void sync(unordered_set<string>& host, bool server); //multi sync
+    void sync(string host, bool server); //single sync
     //=======Helper Functions============
     vector<string> logToKeyValue(string log);
     string keyValueToLog(string key, string value, string op);
@@ -88,7 +89,7 @@ public:
 private:
     //log
     vector <string> log_; //vector of log entries
-    int EOL = 0; //end of log, any higher indicies in log_ are not synced yet
+    map<string,int> EOL; //end of log, any higher indicies in log_ are not synced yet
     int EOC = 0; //end of commited log entires, any higher or equal indecies in log_ are not commited to local
     //Hash Sync
     const int NUM_CHAR_ENTRY; //max num char in log entries
