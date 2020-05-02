@@ -48,7 +48,7 @@ public:
     //====Commit Operations==============
     void processLogEntry();
     //=====Sync Logs=====================
-    void sync(unordered_set<string>& host, bool server); //multi sync
+    void sync(unordered_set<string> host, bool server); //multi sync
     void sync(string host, bool server); //single sync
     //=======Helper Functions============
     vector<string> logToKeyValue(string log);

@@ -149,7 +149,7 @@ void GossipNode::sync(string host, bool server)
     EOL[host] = log_.size();
 }
 
-void GossipNode::sync(unordered_set<string>& hosts, bool server)
+void GossipNode::sync(unordered_set<string> hosts, bool server)
 {
 //sync for 'times' times
     int logSize = log_.size();
