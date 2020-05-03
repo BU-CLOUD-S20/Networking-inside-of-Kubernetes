@@ -12,4 +12,5 @@ niok_add_test(
         cpisync
         gmp 
         ntl 
+        tacopie
 )

@@ -13,6 +13,8 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "_build")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "_build")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "_build")
+set(PROJECT_SOURCE_DIR ".")
+SET(EXECUTABLE_OUTPUT_PATH /root/project/executables/)
 
 # Set the project home dir
 set(NIOK_HOME ${CMAKE_CURRENT_SOURCE_DIR})
@@ -46,6 +48,7 @@ macro(niok_link_libraries target)
         ntl
         cpisync
         gmp
+        tacopie
         -pthread
     )
 endmacro(niok_link_libraries)
